@@ -16,6 +16,7 @@ import PlanView from './components/PlanView'
 import EdgeZone from './components/EdgeZone'
 import TaskModal from './components/TaskModal'
 import PeopleManager from './components/PeopleManager'
+import SettingsPanel from './components/SettingsPanel'
 import TaskCard from './components/TaskCard'
 import { useStore } from './store/useStore'
 import type { ColumnId } from './types'
@@ -36,6 +37,8 @@ export default function App() {
   const reorderColumn = useStore((s) => s.reorderColumn)
   const peopleManagerOpen = useStore((s) => s.peopleManagerOpen)
   const closePeopleManager = useStore((s) => s.closePeopleManager)
+  const settingsOpen = useStore((s) => s.settingsOpen)
+  const closeSettings = useStore((s) => s.closeSettings)
 
   const [modalTaskId, setModalTaskId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -129,7 +132,7 @@ export default function App() {
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="relative h-screen w-screen">
         <div className="aurora-bg" />
-        <div className="relative z-10 flex h-full flex-col">
+        <div className="relative z-[45] flex h-full flex-col">
           <Header />
           <main className="relative flex-1 overflow-hidden">
             {currentPage === 'pinboard' && <Pinboard onCreate={openCreateModal} onEdit={openEditModal} />}
@@ -160,6 +163,7 @@ export default function App() {
       )}
 
       {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
+      {settingsOpen && <SettingsPanel onClose={closeSettings} />}
     </DndContext>
   )
 }
