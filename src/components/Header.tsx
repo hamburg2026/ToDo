@@ -1,5 +1,6 @@
 import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock } from 'lucide-react'
 import { useStore } from '../store/useStore'
+import BackupMenu from './BackupMenu'
 
 export default function Header() {
   const currentPage = useStore((s) => s.currentPage)
@@ -64,6 +65,8 @@ export default function Header() {
         >
           <Users size={14} /> Personen
         </button>
+
+        <BackupMenu />
       </div>
     </header>
   )

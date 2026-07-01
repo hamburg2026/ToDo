@@ -29,6 +29,19 @@ interface StoreState {
   addPerson: (name: string) => Person
   updatePerson: (id: string, patch: Partial<Person>) => void
   deletePerson: (id: string) => void
+
+  exportData: () => string
+  importData: (json: string) => { ok: true } | { ok: false; error: string }
+  resetData: () => void
+}
+
+export const BACKUP_VERSION = 1
+
+interface BackupPayload {
+  version: number
+  exportedAt: number
+  tasks: Task[]
+  people: Person[]
 }
 
 const seedPeople: Person[] = [
@@ -198,6 +211,52 @@ export const useStore = create<StoreState>()(
           people: get().people.filter((p) => p.id !== id),
           tasks: get().tasks.map((t) => (t.assigneeId === id ? { ...t, assigneeId: null } : t)),
         }),
+
+      exportData: () => {
+        const payload: BackupPayload = {
+          version: BACKUP_VERSION,
+          exportedAt: now(),
+          tasks: get().tasks,
+          people: get().people,
+        }
+        return JSON.stringify(payload, null, 2)
+      },
+
+      importData: (json) => {
+        let parsed: unknown
+        try {
+          parsed = JSON.parse(json)
+        } catch {
+          return { ok: false, error: 'Die Datei enthält kein gültiges JSON.' }
+        }
+        if (
+          !parsed ||
+          typeof parsed !== 'object' ||
+          !Array.isArray((parsed as BackupPayload).tasks) ||
+          !Array.isArray((parsed as BackupPayload).people)
+        ) {
+          return { ok: false, error: 'Die Datei hat nicht das erwartete Taskwall-Backup-Format.' }
+        }
+        const payload = parsed as BackupPayload
+        set({
+          tasks: payload.tasks,
+          people: payload.people,
+          currentPage: 'pinboard',
+          activeTaskId: null,
+        })
+        return { ok: true }
+      },
+
+      resetData: () => {
+        const people = seedPeople.map((p) => ({ ...p, id: nanoid() }))
+        set({
+          tasks: seedTasks(people),
+          people,
+          currentPage: 'pinboard',
+          boardView: 'kanban',
+          activeTaskId: null,
+        })
+      },
     }),
     { name: 'taskwall-storage' },
   ),
