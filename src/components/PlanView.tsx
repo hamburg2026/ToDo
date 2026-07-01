@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
 import { categoryColor } from '../lib/constants'
+import { parseLocalDate } from '../lib/date'
 
 interface Props {
   onEdit: (id: string) => void
@@ -27,8 +28,8 @@ export default function PlanView({ onEdit }: Props) {
     let min = today
     let max = new Date(today.getTime() + 21 * DAY_MS)
     scheduled.forEach((t) => {
-      const s = startOfDay(new Date(t.start as string))
-      const e = t.end ? startOfDay(new Date(t.end as string)) : s
+      const s = startOfDay(parseLocalDate(t.start as string))
+      const e = t.end ? startOfDay(parseLocalDate(t.end as string)) : s
       if (s < min) min = s
       if (e > max) max = e
     })
@@ -69,8 +70,8 @@ export default function PlanView({ onEdit }: Props) {
 
           {/* Rows */}
           {scheduled.map((task) => {
-            const s = startOfDay(new Date(task.start as string))
-            const e = task.end ? startOfDay(new Date(task.end as string)) : s
+            const s = startOfDay(parseLocalDate(task.start as string))
+            const e = task.end ? startOfDay(parseLocalDate(task.end as string)) : s
             const offset = Math.max(0, Math.round((s.getTime() - rangeStart.getTime()) / DAY_MS))
             const span = Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY_MS) + 1)
             const assignee = people.find((p) => p.id === task.assigneeId)

@@ -2,6 +2,8 @@ export type Page = 'pinboard' | 'board'
 
 export type BoardView = 'kanban' | 'plan'
 
+export type CardFont = 'sans' | 'hand' | 'serif'
+
 export type ColumnId = 'backlog' | 'progress' | 'review' | 'done'
 
 export interface Column {

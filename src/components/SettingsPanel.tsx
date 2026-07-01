@@ -1,0 +1,60 @@
+import { Check, X } from 'lucide-react'
+import { useStore } from '../store/useStore'
+import { CARD_FONT_CLASSES, CARD_FONT_OPTIONS } from '../lib/constants'
+
+interface Props {
+  onClose: () => void
+}
+
+export default function SettingsPanel({ onClose }: Props) {
+  const cardFont = useStore((s) => s.cardFont)
+  const setCardFont = useStore((s) => s.setCardFont)
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in" onClick={onClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-2xl glass p-6 shadow-glow animate-pop-in"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white">Einstellungen</h2>
+          <button onClick={onClose} className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+            <X size={18} />
+          </button>
+        </div>
+
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">Kartenschrift</p>
+        <p className="mb-3 text-sm text-white/60">
+          Bestimmt die Schriftart für die Aufgabentitel auf den Kacheln.
+        </p>
+
+        <div className="space-y-2">
+          {CARD_FONT_OPTIONS.map((option) => {
+            const active = cardFont === option.id
+            return (
+              <button
+                key={option.id}
+                onClick={() => setCardFont(option.id)}
+                className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors ${
+                  active ? 'border-violet-400 bg-violet-500/15' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                }`}
+              >
+                <div>
+                  <p className={`${CARD_FONT_CLASSES[option.id]} text-xl font-bold text-white`}>Aufgabe erledigen</p>
+                  <p className="mt-0.5 text-xs text-white/50">
+                    {option.label} · {option.hint}
+                  </p>
+                </div>
+                {active && (
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-500 text-white">
+                    <Check size={14} />
+                  </div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}

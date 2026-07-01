@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { BoardView, ColumnId, Page, Person, Task, TaskDraft } from '../types'
+import type { BoardView, CardFont, ColumnId, Page, Person, Task, TaskDraft } from '../types'
 import { CARD_COLORS, PERSON_COLORS, initialsOf, randomPick } from '../lib/constants'
 
 interface StoreState {
@@ -9,13 +9,18 @@ interface StoreState {
   people: Person[]
   currentPage: Page
   boardView: BoardView
+  cardFont: CardFont
   peopleManagerOpen: boolean
+  settingsOpen: boolean
   activeTaskId: string | null
 
   setCurrentPage: (page: Page) => void
   setBoardView: (view: BoardView) => void
+  setCardFont: (font: CardFont) => void
   openPeopleManager: () => void
   closePeopleManager: () => void
+  openSettings: () => void
+  closeSettings: () => void
   setActiveTaskId: (id: string | null) => void
 
   addTask: (draft: TaskDraft, position?: { x: number; y: number }) => Task
@@ -102,13 +107,18 @@ export const useStore = create<StoreState>()(
       people: seedPeople,
       currentPage: 'pinboard',
       boardView: 'kanban',
+      cardFont: 'sans',
       peopleManagerOpen: false,
+      settingsOpen: false,
       activeTaskId: null,
 
       setCurrentPage: (page) => set({ currentPage: page }),
       setBoardView: (view) => set({ boardView: view }),
+      setCardFont: (font) => set({ cardFont: font }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
       closePeopleManager: () => set({ peopleManagerOpen: false }),
+      openSettings: () => set({ settingsOpen: true }),
+      closeSettings: () => set({ settingsOpen: false }),
       setActiveTaskId: (id) => set({ activeTaskId: id }),
 
       addTask: (draft, position) => {

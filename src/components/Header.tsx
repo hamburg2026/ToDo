@@ -1,4 +1,4 @@
-import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock } from 'lucide-react'
+import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock, Settings } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 
@@ -8,9 +8,10 @@ export default function Header() {
   const boardView = useStore((s) => s.boardView)
   const setBoardView = useStore((s) => s.setBoardView)
   const openPeopleManager = useStore((s) => s.openPeopleManager)
+  const openSettings = useStore((s) => s.openSettings)
 
   return (
-    <header className="relative z-30 flex items-center justify-between px-6 py-4">
+    <header className="relative z-50 flex items-center justify-between px-6 py-4">
       <div className="flex items-center gap-2.5">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 shadow-glow">
           <LayoutGrid size={18} className="text-white" />
@@ -67,6 +68,14 @@ export default function Header() {
         </button>
 
         <BackupMenu />
+
+        <button
+          onClick={openSettings}
+          aria-label="Einstellungen"
+          className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 p-2 text-white/80 transition-colors hover:bg-white/10"
+        >
+          <Settings size={16} />
+        </button>
       </div>
     </header>
   )

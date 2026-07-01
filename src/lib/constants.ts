@@ -1,4 +1,4 @@
-import type { Column } from '../types'
+import type { CardFont, Column } from '../types'
 
 export const COLUMNS: Column[] = [
   { id: 'backlog', title: 'Backlog', accent: '#8b5cf6' },
@@ -36,6 +36,18 @@ export const PERSON_COLORS = [
   '#60a5fa',
   '#f472b6',
   '#a3e635',
+]
+
+export const CARD_FONT_CLASSES: Record<CardFont, string> = {
+  sans: 'font-sans',
+  hand: 'font-hand',
+  serif: 'font-serif',
+}
+
+export const CARD_FONT_OPTIONS: { id: CardFont; label: string; hint: string }[] = [
+  { id: 'sans', label: 'Modern', hint: 'Klar & gut lesbar (Inter)' },
+  { id: 'serif', label: 'Serifen', hint: 'Klassisch & elegant' },
+  { id: 'hand', label: 'Handschrift', hint: 'Verspielt wie ein Notizzettel' },
 ]
 
 export function categoryColor(name: string): string {

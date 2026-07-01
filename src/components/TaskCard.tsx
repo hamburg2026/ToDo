@@ -1,7 +1,8 @@
 import { CalendarRange, Pencil, Trash2 } from 'lucide-react'
 import type { Task } from '../types'
 import { useStore } from '../store/useStore'
-import { categoryColor } from '../lib/constants'
+import { categoryColor, CARD_FONT_CLASSES } from '../lib/constants'
+import { formatDate } from '../lib/date'
 
 interface Props {
   task: Task
@@ -11,15 +12,10 @@ interface Props {
   dragHandleProps?: Record<string, unknown>
 }
 
-function formatDate(iso: string | null): string {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
-}
-
 export default function TaskCard({ task, dragging, compact, onEdit, dragHandleProps }: Props) {
   const people = useStore((s) => s.people)
   const deleteTask = useStore((s) => s.deleteTask)
+  const cardFont = useStore((s) => s.cardFont)
   const assignee = people.find((p) => p.id === task.assigneeId)
 
   return (
@@ -35,7 +31,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       <div className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-white/70 shadow-sm ring-1 ring-black/10" />
 
       <div className="mb-1.5 flex items-start justify-between gap-2">
-        <h3 className="font-hand text-lg font-bold leading-snug text-slate-900">{task.title}</h3>
+        <h3 className={`${CARD_FONT_CLASSES[cardFont]} text-lg font-bold leading-snug text-slate-900`}>{task.title}</h3>
         <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={(e) => {
