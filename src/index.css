@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background-color: #0a0a12;
+  color: #e9e9f5;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-hand {
+  font-family: 'Caveat', cursive;
+}
+
+/* Ambient animated aurora background */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #0a0a12;
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.aurora-bg::before {
+  width: 55vmax;
+  height: 55vmax;
+  top: -20vmax;
+  left: -10vmax;
+  background: radial-gradient(circle at 30% 30%, #8b5cf6, transparent 65%);
+  animation: drift1 22s ease-in-out infinite alternate;
+}
+
+.aurora-bg::after {
+  width: 60vmax;
+  height: 60vmax;
+  bottom: -25vmax;
+  right: -15vmax;
+  background: radial-gradient(circle at 70% 70%, #22d3ee, transparent 65%);
+  animation: drift2 26s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(8vw, 6vh) scale(1.15); }
+}
+
+@keyframes drift2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-6vw, -8vh) scale(1.1); }
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.glass {
+  background: rgba(22, 22, 37, 0.6);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* hide native scrollbar for corkboard while still scrollable */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
