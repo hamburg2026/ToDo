@@ -1,6 +1,6 @@
 import { Check, X } from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { CARD_FONT_CLASSES, CARD_FONT_OPTIONS } from '../lib/constants'
+import { CARD_FONT_CLASSES, CARD_FONT_OPTIONS, CARD_FONT_SIZE_CLASSES, CARD_FONT_SIZE_OPTIONS } from '../lib/constants'
 
 interface Props {
   onClose: () => void
@@ -9,6 +9,8 @@ interface Props {
 export default function SettingsPanel({ onClose }: Props) {
   const cardFont = useStore((s) => s.cardFont)
   const setCardFont = useStore((s) => s.setCardFont)
+  const cardFontSize = useStore((s) => s.cardFontSize)
+  const setCardFontSize = useStore((s) => s.setCardFontSize)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in" onClick={onClose}>
@@ -50,6 +52,29 @@ export default function SettingsPanel({ onClose }: Props) {
                     <Check size={14} />
                   </div>
                 )}
+              </button>
+            )
+          })}
+        </div>
+
+        <p className="mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-white/50">Schriftgröße</p>
+        <p className="mb-3 text-sm text-white/60">Bestimmt, wie groß Titel und Text auf den Kacheln erscheinen.</p>
+
+        <div className="grid grid-cols-3 gap-2">
+          {CARD_FONT_SIZE_OPTIONS.map((option) => {
+            const active = cardFontSize === option.id
+            return (
+              <button
+                key={option.id}
+                onClick={() => setCardFontSize(option.id)}
+                className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 transition-colors ${
+                  active ? 'border-violet-400 bg-violet-500/15' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                }`}
+              >
+                <span className={`${CARD_FONT_CLASSES[cardFont]} ${CARD_FONT_SIZE_CLASSES[option.id].title} font-bold text-white`}>
+                  Aa
+                </span>
+                <span className="text-xs text-white/60">{option.label}</span>
               </button>
             )
           })}

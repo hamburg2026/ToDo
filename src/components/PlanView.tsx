@@ -17,7 +17,8 @@ function startOfDay(d: Date) {
 }
 
 export default function PlanView({ onEdit }: Props) {
-  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board')
+  const activeBoardId = useStore((s) => s.activeBoardId)
+  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId)
   const people = useStore((s) => s.people)
 
   const scheduled = tasks.filter((t) => t.start)

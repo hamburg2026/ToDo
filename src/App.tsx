@@ -3,8 +3,11 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
@@ -14,8 +17,10 @@ import Pinboard from './components/Pinboard'
 import KanbanBoard from './components/KanbanBoard'
 import PlanView from './components/PlanView'
 import EdgeZone from './components/EdgeZone'
+import BoardTabs from './components/BoardTabs'
 import TaskModal from './components/TaskModal'
 import PeopleManager from './components/PeopleManager'
+import BoardsManager from './components/BoardsManager'
 import SettingsPanel from './components/SettingsPanel'
 import TaskCard from './components/TaskCard'
 import { useStore } from './store/useStore'
@@ -26,17 +31,30 @@ const CARD_H = 150
 const CANVAS_W = 2200
 const CANVAS_H = 1400
 
+// Prefer whatever droppable the pointer is literally over (correct for narrow
+// targets like the board tabs), falling back to rect overlap when the pointer
+// briefly isn't inside any droppable (e.g. in gaps between columns).
+const collisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args)
+  return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args)
+}
+
 export default function App() {
   const currentPage = useStore((s) => s.currentPage)
   const setCurrentPage = useStore((s) => s.setCurrentPage)
   const boardView = useStore((s) => s.boardView)
   const tasks = useStore((s) => s.tasks)
+  const activeBoardId = useStore((s) => s.activeBoardId)
+  const setActiveBoardId = useStore((s) => s.setActiveBoardId)
   const setTaskPosition = useStore((s) => s.setTaskPosition)
   const sendTaskToPage = useStore((s) => s.sendTaskToPage)
+  const moveTaskToBoard = useStore((s) => s.moveTaskToBoard)
   const moveTaskToColumn = useStore((s) => s.moveTaskToColumn)
   const reorderColumn = useStore((s) => s.reorderColumn)
   const peopleManagerOpen = useStore((s) => s.peopleManagerOpen)
   const closePeopleManager = useStore((s) => s.closePeopleManager)
+  const boardsManagerOpen = useStore((s) => s.boardsManagerOpen)
+  const closeBoardsManager = useStore((s) => s.closeBoardsManager)
   const settingsOpen = useStore((s) => s.settingsOpen)
   const closeSettings = useStore((s) => s.closeSettings)
 
@@ -72,17 +90,23 @@ export default function App() {
     const task = tasks.find((t) => t.id === active.id)
     if (!task) return
 
-    // Navigate to the other page via edge drop
-    if (typeof over?.id === 'string' && over.id.startsWith('edge-nav-')) {
-      if (task.page === 'pinboard') {
-        sendTaskToPage(task.id, 'board')
-        setCurrentPage('board')
-      } else {
-        const randX = 200 + Math.random() * 500
-        const randY = 150 + Math.random() * 400
-        sendTaskToPage(task.id, 'pinboard', { x: randX, y: randY })
-        setCurrentPage('pinboard')
+    // Drag onto a board tab (Lasche) on the right edge: move the task into that board
+    if (typeof over?.id === 'string' && over.id.startsWith('board-tab-')) {
+      const targetBoardId = over.id.slice('board-tab-'.length)
+      if (task.page !== 'board' || task.boardId !== targetBoardId) {
+        moveTaskToBoard(task.id, targetBoardId)
       }
+      setActiveBoardId(targetBoardId)
+      setCurrentPage('board')
+      return
+    }
+
+    // Drag onto the left edge (only visible on the board page): back to the pinboard
+    if (typeof over?.id === 'string' && over.id.startsWith('edge-nav-')) {
+      const randX = 200 + Math.random() * 500
+      const randY = 150 + Math.random() * 400
+      sendTaskToPage(task.id, 'pinboard', { x: randX, y: randY })
+      setCurrentPage('pinboard')
       return
     }
 
@@ -100,7 +124,7 @@ export default function App() {
     if (overType === 'column') {
       const columnId = over.id as ColumnId
       if (columnId !== task.columnId) {
-        moveTaskToColumn(task.id, columnId)
+        moveTaskToColumn(task.id, activeBoardId, columnId)
       }
       return
     }
@@ -110,38 +134,43 @@ export default function App() {
       if (!overTask) return
       if (overTask.columnId === task.columnId) {
         const columnTasks = tasks
-          .filter((t) => t.columnId === task.columnId)
+          .filter((t) => t.columnId === task.columnId && t.boardId === activeBoardId)
           .sort((a, b) => a.order - b.order)
         const oldIndex = columnTasks.findIndex((t) => t.id === task.id)
         const newIndex = columnTasks.findIndex((t) => t.id === overTask.id)
         if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
           const reordered = arrayMove(columnTasks, oldIndex, newIndex)
-          reorderColumn(task.columnId, reordered.map((t) => t.id))
+          reorderColumn(activeBoardId, task.columnId, reordered.map((t) => t.id))
         }
       } else {
         const targetTasks = tasks
-          .filter((t) => t.columnId === overTask.columnId)
+          .filter((t) => t.columnId === overTask.columnId && t.boardId === activeBoardId)
           .sort((a, b) => a.order - b.order)
         const targetIndex = targetTasks.findIndex((t) => t.id === overTask.id)
-        moveTaskToColumn(task.id, overTask.columnId, targetIndex)
+        moveTaskToColumn(task.id, activeBoardId, overTask.columnId, targetIndex)
       }
     }
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={collisionDetection}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="relative h-screen w-screen">
         <div className="aurora-bg" />
-        <div className="relative z-[45] flex h-full flex-col">
+        <div className="flex h-full flex-col">
           <Header />
-          <main className="relative flex-1 overflow-hidden">
+          <main className="relative z-0 flex-1 overflow-hidden">
             {currentPage === 'pinboard' && <Pinboard onCreate={openCreateModal} onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'kanban' && <KanbanBoard onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'plan' && <PlanView onEdit={openEditModal} />}
           </main>
         </div>
 
-        <EdgeZone side="right" label="Kanban Board" active={currentPage === 'pinboard'} />
+        <BoardTabs />
         <EdgeZone side="left" label="Zur Pinnwand" active={currentPage === 'board'} />
 
         <DragOverlay style={{ zIndex: 9999 }}>
@@ -163,6 +192,7 @@ export default function App() {
       )}
 
       {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
+      {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
       {settingsOpen && <SettingsPanel onClose={closeSettings} />}
     </DndContext>
   )

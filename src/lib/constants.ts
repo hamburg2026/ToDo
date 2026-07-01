@@ -1,4 +1,4 @@
-import type { CardFont, Column } from '../types'
+import type { CardFont, CardFontSize, Column } from '../types'
 
 export const COLUMNS: Column[] = [
   { id: 'backlog', title: 'Backlog', accent: '#8b5cf6' },
@@ -38,6 +38,15 @@ export const PERSON_COLORS = [
   '#a3e635',
 ]
 
+export const BOARD_COLORS = [
+  '#8b5cf6',
+  '#22d3ee',
+  '#fb7185',
+  '#f59e0b',
+  '#34d399',
+  '#60a5fa',
+]
+
 export const CARD_FONT_CLASSES: Record<CardFont, string> = {
   sans: 'font-sans',
   hand: 'font-hand',
@@ -48,6 +57,18 @@ export const CARD_FONT_OPTIONS: { id: CardFont; label: string; hint: string }[] 
   { id: 'sans', label: 'Modern', hint: 'Klar & gut lesbar (Inter)' },
   { id: 'serif', label: 'Serifen', hint: 'Klassisch & elegant' },
   { id: 'hand', label: 'Handschrift', hint: 'Verspielt wie ein Notizzettel' },
+]
+
+export const CARD_FONT_SIZE_CLASSES: Record<CardFontSize, { title: string; description: string }> = {
+  sm: { title: 'text-base', description: 'text-xs' },
+  md: { title: 'text-lg', description: 'text-[13px]' },
+  lg: { title: 'text-xl', description: 'text-sm' },
+}
+
+export const CARD_FONT_SIZE_OPTIONS: { id: CardFontSize; label: string }[] = [
+  { id: 'sm', label: 'Klein' },
+  { id: 'md', label: 'Normal' },
+  { id: 'lg', label: 'Groß' },
 ]
 
 export function categoryColor(name: string): string {
