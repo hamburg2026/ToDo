@@ -12,6 +12,8 @@ export type ThemeId = 'blue' | 'teal' | 'purple' | 'navy'
 
 export type ColumnId = 'backlog' | 'progress' | 'review' | 'done'
 
+export type TaskStatus = 'none' | 'offen' | 'in-arbeit' | 'erledigt' | 'blockiert'
+
 export interface Column {
   id: ColumnId
   title: string
@@ -42,6 +44,7 @@ export interface Task {
   hashtags: string[]
   today: boolean
   important: boolean
+  status: TaskStatus
   page: Page
   boardId: string | null
   columnId: ColumnId
