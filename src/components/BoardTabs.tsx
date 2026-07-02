@@ -16,7 +16,7 @@ function BoardTab({ board, active, onClick }: TabProps) {
       ref={setNodeRef}
       onClick={onClick}
       title={board.name}
-      className={`flex items-center gap-2 rounded-l-2xl border py-3 pl-3 pr-2 shadow-card transition-all ${
+      className={`pointer-events-auto flex items-center gap-2 rounded-l-2xl border py-3 pl-3 pr-2 shadow-card transition-all ${
         isOver
           ? 'scale-110 border-[#151f76]/30 shadow-glow animate-pulse-edge'
           : active
@@ -46,7 +46,7 @@ export default function BoardTabs() {
   const setCurrentPage = useStore((s) => s.setCurrentPage)
 
   return (
-    <div className="fixed right-0 top-0 z-40 flex h-full flex-col items-end justify-center gap-3 py-6">
+    <div className="pointer-events-none fixed right-0 top-0 z-40 flex h-full flex-col items-end justify-center gap-3 py-6">
       {boards.map((board) => (
         <BoardTab
           key={board.id}

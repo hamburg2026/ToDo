@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
 import type { AppView, Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, ThemeId } from '../types'
-import { BOARD_COLORS, CARD_COLORS, PERSON_COLORS, initialsOf, randomPick } from '../lib/constants'
+import { BOARD_COLORS, CARD_COLORS, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
 
 interface StoreState {
   tasks: Task[]
@@ -14,6 +14,8 @@ interface StoreState {
   cardFont: CardFont
   cardFontSize: CardFontSize
   theme: ThemeId
+  pinboardZoom: number
+  kanbanZoom: number
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
   settingsOpen: boolean
@@ -24,6 +26,8 @@ interface StoreState {
   setCardFont: (font: CardFont) => void
   setCardFontSize: (size: CardFontSize) => void
   setTheme: (theme: ThemeId) => void
+  setPinboardZoom: (zoom: number) => void
+  setKanbanZoom: (zoom: number) => void
   openPeopleManager: () => void
   closePeopleManager: () => void
   openBoardsManager: () => void
@@ -94,6 +98,8 @@ function seedTasks(people: Person[]): Task[] {
       end: null,
       category: 'Idee',
       hashtags: ['start', 'willkommen'],
+      today: false,
+      important: false,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -114,6 +120,8 @@ function seedTasks(people: Person[]): Task[] {
       end: null,
       category: 'Projekt',
       hashtags: ['planung'],
+      today: true,
+      important: true,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -140,6 +148,8 @@ export const useStore = create<StoreState>()(
       cardFont: 'sans',
       cardFontSize: 'md',
       theme: 'blue',
+      pinboardZoom: 1,
+      kanbanZoom: 1,
       peopleManagerOpen: false,
       boardsManagerOpen: false,
       settingsOpen: false,
@@ -150,6 +160,8 @@ export const useStore = create<StoreState>()(
       setCardFont: (font) => set({ cardFont: font }),
       setCardFontSize: (size) => set({ cardFontSize: size }),
       setTheme: (theme) => set({ theme }),
+      setPinboardZoom: (zoom) => set({ pinboardZoom: clampZoom(zoom) }),
+      setKanbanZoom: (zoom) => set({ kanbanZoom: clampZoom(zoom) }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
       closePeopleManager: () => set({ peopleManagerOpen: false }),
       openBoardsManager: () => set({ boardsManagerOpen: true }),

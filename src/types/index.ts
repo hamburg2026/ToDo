@@ -40,6 +40,8 @@ export interface Task {
   end: string | null // ISO date (yyyy-mm-dd)
   category: string
   hashtags: string[]
+  today: boolean
+  important: boolean
   page: Page
   boardId: string | null
   columnId: ColumnId

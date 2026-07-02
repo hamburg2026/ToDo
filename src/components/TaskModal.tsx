@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Users, Hash, PenLine } from 'lucide-react'
+import { X, Users, Hash, PenLine, CalendarDays, Star } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { CARD_COLORS, CATEGORIES, categoryColor } from '../lib/constants'
 import type { Task } from '../types'
@@ -27,6 +27,8 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
   const [hashtags, setHashtags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
   const [color, setColor] = useState(CARD_COLORS[0])
+  const [today, setToday] = useState(false)
+  const [important, setImportant] = useState(false)
   const [handwritingOpen, setHandwritingOpen] = useState(false)
 
   useEffect(() => {
@@ -39,6 +41,8 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
       setCategory(task.category)
       setHashtags(task.hashtags)
       setColor(task.color)
+      setToday(task.today ?? false)
+      setImportant(task.important ?? false)
     } else {
       setTitle('')
       setDescription('')
@@ -48,6 +52,8 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
       setCategory('')
       setHashtags([])
       setColor(CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)])
+      setToday(false)
+      setImportant(false)
     }
     setTagInput('')
   }, [task, taskId])
@@ -81,6 +87,8 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
       category: category.trim(),
       hashtags,
       color,
+      today,
+      important,
     }
     if (task) {
       updateTask(task.id, payload as Partial<Task>)
@@ -229,6 +237,36 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
                 placeholder="tag + Enter"
                 className="min-w-[90px] flex-1 bg-transparent px-1 py-0.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none"
               />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Kennzeichnung</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setToday((v) => !v)}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  today
+                    ? 'border-violet-400 bg-violet-500/15 text-[#151f76]'
+                    : 'border-[#151f76]/10 bg-[#151f76]/4 text-[#151f76]/65 hover:bg-[#151f76]/6'
+                }`}
+              >
+                <CalendarDays size={14} />
+                Heute
+              </button>
+              <button
+                type="button"
+                onClick={() => setImportant((v) => !v)}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  important
+                    ? 'border-rose-400 bg-rose-500/15 text-rose-700'
+                    : 'border-[#151f76]/10 bg-[#151f76]/4 text-[#151f76]/65 hover:bg-[#151f76]/6'
+                }`}
+              >
+                <Star size={14} className={important ? 'fill-rose-600' : ''} />
+                Wichtig
+              </button>
             </div>
           </div>
 
