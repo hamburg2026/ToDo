@@ -16,6 +16,7 @@ import Header from './components/Header'
 import Pinboard from './components/Pinboard'
 import KanbanBoard from './components/KanbanBoard'
 import PlanView from './components/PlanView'
+import AnalyticsView from './components/AnalyticsView'
 import EdgeZone from './components/EdgeZone'
 import BoardTabs from './components/BoardTabs'
 import TaskModal from './components/TaskModal'
@@ -169,6 +170,7 @@ export default function App() {
             {currentPage === 'pinboard' && <Pinboard onCreate={openCreateModal} onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'kanban' && <KanbanBoard onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'plan' && <PlanView onEdit={openEditModal} />}
+            {currentPage === 'analytics' && <AnalyticsView onEdit={openEditModal} />}
           </main>
         </div>
 

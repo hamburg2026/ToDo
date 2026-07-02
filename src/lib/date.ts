@@ -18,3 +18,16 @@ export function formatDateShort(iso: string | null): string {
   if (!iso) return ''
   return parseLocalDate(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
 }
+
+function startOfDay(d: Date): Date {
+  const c = new Date(d)
+  c.setHours(0, 0, 0, 0)
+  return c
+}
+
+// Whole days from today to the given date; negative when the date is in the past.
+export function daysUntil(iso: string): number {
+  const today = startOfDay(new Date()).getTime()
+  const target = startOfDay(parseLocalDate(iso)).getTime()
+  return Math.round((target - today) / (24 * 60 * 60 * 1000))
+}

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, ThemeId } from '../types'
+import type { AppView, Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, ThemeId } from '../types'
 import { BOARD_COLORS, CARD_COLORS, PERSON_COLORS, initialsOf, randomPick } from '../lib/constants'
 
 interface StoreState {
@@ -9,7 +9,7 @@ interface StoreState {
   people: Person[]
   boards: Board[]
   activeBoardId: string
-  currentPage: Page
+  currentPage: AppView
   boardView: BoardView
   cardFont: CardFont
   cardFontSize: CardFontSize
@@ -19,7 +19,7 @@ interface StoreState {
   settingsOpen: boolean
   activeTaskId: string | null
 
-  setCurrentPage: (page: Page) => void
+  setCurrentPage: (page: AppView) => void
   setBoardView: (view: BoardView) => void
   setCardFont: (font: CardFont) => void
   setCardFontSize: (size: CardFontSize) => void

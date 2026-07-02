@@ -21,16 +21,19 @@ export default function PlanView({ onEdit }: Props) {
   const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId)
   const people = useStore((s) => s.people)
 
-  const scheduled = tasks.filter((t) => t.start)
-  const unscheduled = tasks.filter((t) => !t.start)
+  // A task only needs a Zieldatum (end date) to appear in the plan; the start
+  // date is optional and, when missing, the task is shown as a single-day
+  // marker on its deadline.
+  const scheduled = tasks.filter((t) => t.end)
+  const unscheduled = tasks.filter((t) => !t.end)
 
   const { days, rangeStart } = useMemo(() => {
     const today = startOfDay(new Date())
     let min = today
     let max = new Date(today.getTime() + 21 * DAY_MS)
     scheduled.forEach((t) => {
-      const s = startOfDay(parseLocalDate(t.start as string))
-      const e = t.end ? startOfDay(parseLocalDate(t.end as string)) : s
+      const e = startOfDay(parseLocalDate(t.end as string))
+      const s = t.start ? startOfDay(parseLocalDate(t.start)) : e
       if (s < min) min = s
       if (e > max) max = e
     })
@@ -71,8 +74,8 @@ export default function PlanView({ onEdit }: Props) {
 
           {/* Rows */}
           {scheduled.map((task) => {
-            const s = startOfDay(parseLocalDate(task.start as string))
-            const e = task.end ? startOfDay(parseLocalDate(task.end as string)) : s
+            const e = startOfDay(parseLocalDate(task.end as string))
+            const s = task.start ? startOfDay(parseLocalDate(task.start)) : e
             const offset = Math.max(0, Math.round((s.getTime() - rangeStart.getTime()) / DAY_MS))
             const span = Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY_MS) + 1)
             const assignee = people.find((p) => p.id === task.assigneeId)
@@ -122,7 +125,7 @@ export default function PlanView({ onEdit }: Props) {
 
           {scheduled.length === 0 && (
             <div className="flex h-32 items-center justify-center text-sm text-white/30">
-              Keine terminierten Aufgaben im Board. Vergib Start-/Enddatum in der Aufgabe.
+              Keine terminierten Aufgaben im Board. Vergib ein Zieldatum in der Aufgabe.
             </div>
           )}
         </div>
@@ -130,7 +133,7 @@ export default function PlanView({ onEdit }: Props) {
 
       {unscheduled.length > 0 && (
         <div className="rounded-2xl glass p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">Ohne Termin</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">Ohne Zieldatum</p>
           <div className="flex flex-wrap gap-2">
             {unscheduled.map((task) => (
               <button

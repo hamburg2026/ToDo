@@ -1,5 +1,7 @@
 export type Page = 'pinboard' | 'board'
 
+export type AppView = 'pinboard' | 'board' | 'analytics'
+
 export type BoardView = 'kanban' | 'plan'
 
 export type CardFont = 'sans' | 'hand' | 'serif'
