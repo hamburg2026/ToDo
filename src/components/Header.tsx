@@ -1,4 +1,4 @@
-import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock, Settings, Layers } from 'lucide-react'
+import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock, Settings, Layers, BarChart3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 
@@ -39,6 +39,14 @@ export default function Header() {
           }`}
         >
           <KanbanSquare size={14} /> Board
+        </button>
+        <button
+          onClick={() => setCurrentPage('analytics')}
+          className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+            currentPage === 'analytics' ? 'accent-gradient text-white shadow-glow' : 'text-white/60 hover:text-white'
+          }`}
+        >
+          <BarChart3 size={14} /> Auswertung
         </button>
       </div>
 
