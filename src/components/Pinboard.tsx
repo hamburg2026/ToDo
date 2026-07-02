@@ -35,7 +35,7 @@ export default function Pinboard({ onCreate, onEdit }: Props) {
       <div className="fixed bottom-8 left-8 z-30 flex items-center gap-3">
         <button
           onClick={() => onCreate()}
-          className="flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 font-semibold text-white shadow-glow transition-transform hover:scale-105 active:scale-95"
+          className="flex items-center gap-2 rounded-full accent-gradient px-5 py-3 font-semibold text-white shadow-glow transition-transform hover:scale-105 active:scale-95"
         >
           <Plus size={18} />
           Neue Aufgabe

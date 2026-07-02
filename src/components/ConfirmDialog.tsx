@@ -33,7 +33,7 @@ export default function ConfirmDialog({ title, message, confirmLabel = 'Bestäti
           <button
             onClick={onConfirm}
             className={`rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105 ${
-              danger ? 'bg-gradient-to-r from-rose-600 to-red-500' : 'bg-gradient-to-r from-violet-600 to-fuchsia-500'
+              danger ? 'bg-gradient-to-r from-rose-600 to-red-500' : 'accent-gradient'
             }`}
           >
             {confirmLabel}

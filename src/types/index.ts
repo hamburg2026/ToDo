@@ -6,6 +6,8 @@ export type CardFont = 'sans' | 'hand' | 'serif'
 
 export type CardFontSize = 'sm' | 'md' | 'lg'
 
+export type ThemeId = 'violet' | 'ocean' | 'sunset' | 'forest' | 'berry'
+
 export type ColumnId = 'backlog' | 'progress' | 'review' | 'done'
 
 export interface Column {

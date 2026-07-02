@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { X, Users, Hash, PenLine } from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { CARD_COLORS, CATEGORIES } from '../lib/constants'
+import { CARD_COLORS, CATEGORIES, categoryColor } from '../lib/constants'
 import type { Task } from '../types'
 import HandwritingOverlay from './HandwritingOverlay'
 
@@ -137,9 +137,9 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="mb-1 flex items-center justify-between">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="min-w-0">
+              <div className="mb-1 flex flex-wrap items-center justify-between gap-1">
                 <label className="text-xs font-semibold uppercase tracking-wide text-white/50">Zuständigkeit</label>
                 <button
                   type="button"
@@ -163,41 +163,48 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
               </select>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Kategorie</label>
               <input
-                list="category-options"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="z. B. Projekt"
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
               />
-              <datalist id="category-options">
+              <div className="mt-1.5 flex flex-wrap gap-1">
                 {CATEGORIES.map((c) => (
-                  <option key={c.name} value={c.name} />
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => setCategory(c.name)}
+                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white transition-transform hover:scale-105"
+                    style={{ backgroundColor: categoryColor(c.name), opacity: category === c.name ? 1 : 0.55 }}
+                  >
+                    {c.name}
+                  </button>
                 ))}
-              </datalist>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Beginn</label>
               <input
                 type="date"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 [color-scheme:dark]"
+                className="w-full min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 [color-scheme:dark]"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Ende</label>
               <input
                 type="date"
                 value={end}
                 min={start || undefined}
                 onChange={(e) => setEnd(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 [color-scheme:dark]"
+                className="w-full min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 [color-scheme:dark]"
               />
             </div>
           </div>
@@ -252,7 +259,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
           </button>
           <button
             type="submit"
-            className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
+            className="rounded-lg accent-gradient px-5 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
           >
             {task ? 'Speichern' : 'Erstellen'}
           </button>

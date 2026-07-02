@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <header className="relative z-50 flex items-center justify-between px-6 py-4">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 shadow-glow">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl accent-gradient shadow-glow">
           <LayoutGrid size={18} className="text-white" />
         </div>
         <span className="text-lg font-extrabold tracking-tight text-white">Taskwall</span>
@@ -27,7 +27,7 @@ export default function Header() {
         <button
           onClick={() => setCurrentPage('pinboard')}
           className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-            currentPage === 'pinboard' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-glow' : 'text-white/60 hover:text-white'
+            currentPage === 'pinboard' ? 'accent-gradient text-white shadow-glow' : 'text-white/60 hover:text-white'
           }`}
         >
           <PinIcon size={14} /> Pinnwand
@@ -35,7 +35,7 @@ export default function Header() {
         <button
           onClick={() => setCurrentPage('board')}
           className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-            currentPage === 'board' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-glow' : 'text-white/60 hover:text-white'
+            currentPage === 'board' ? 'accent-gradient text-white shadow-glow' : 'text-white/60 hover:text-white'
           }`}
         >
           <KanbanSquare size={14} /> Board

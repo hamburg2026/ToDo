@@ -64,7 +64,7 @@ export default function BoardsManager({ onClose }: Props) {
           />
           <button
             type="submit"
-            className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-500 px-4 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
+            className="flex items-center gap-1 rounded-lg accent-gradient px-4 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
           >
             <Plus size={16} /> Hinzufügen
           </button>
