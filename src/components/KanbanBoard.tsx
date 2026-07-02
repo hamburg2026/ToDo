@@ -9,7 +9,7 @@ interface Props {
 
 export default function KanbanBoard({ onEdit }: Props) {
   const activeBoardId = useStore((s) => s.activeBoardId)
-  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId)
+  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId && !t.archived)
   const zoom = useStore((s) => s.kanbanZoom)
   const setZoom = useStore((s) => s.setKanbanZoom)
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { AppView, Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, ThemeId } from '../types'
+import type { AppView, Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
 import { BOARD_COLORS, CARD_COLORS, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
 
 interface StoreState {
@@ -15,10 +15,12 @@ interface StoreState {
   cardFontSize: CardFontSize
   theme: ThemeId
   pinboardZoom: number
+  todayZoom: number
   kanbanZoom: number
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
   settingsOpen: boolean
+  archiveOpen: boolean
   activeTaskId: string | null
 
   setCurrentPage: (page: AppView) => void
@@ -27,6 +29,7 @@ interface StoreState {
   setCardFontSize: (size: CardFontSize) => void
   setTheme: (theme: ThemeId) => void
   setPinboardZoom: (zoom: number) => void
+  setTodayZoom: (zoom: number) => void
   setKanbanZoom: (zoom: number) => void
   openPeopleManager: () => void
   closePeopleManager: () => void
@@ -34,6 +37,8 @@ interface StoreState {
   closeBoardsManager: () => void
   openSettings: () => void
   closeSettings: () => void
+  openArchive: () => void
+  closeArchive: () => void
   setActiveTaskId: (id: string | null) => void
 
   addTask: (draft: TaskDraft, position?: { x: number; y: number }) => Task
@@ -44,6 +49,7 @@ interface StoreState {
   setTaskPosition: (id: string, x: number, y: number) => void
   sendTaskToPage: (id: string, page: Page, position?: { x: number; y: number }) => void
   moveTaskToBoard: (id: string, boardId: string) => void
+  restoreFromArchive: (id: string, status: TaskStatus) => void
 
   addPerson: (name: string) => Person
   updatePerson: (id: string, patch: Partial<Person>) => void
@@ -101,6 +107,7 @@ function seedTasks(people: Person[]): Task[] {
       today: false,
       important: false,
       status: 'none',
+      archived: false,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -124,6 +131,7 @@ function seedTasks(people: Person[]): Task[] {
       today: true,
       important: true,
       status: 'in-arbeit',
+      archived: false,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -151,10 +159,12 @@ export const useStore = create<StoreState>()(
       cardFontSize: 'md',
       theme: 'blue',
       pinboardZoom: 1,
+      todayZoom: 1,
       kanbanZoom: 1,
       peopleManagerOpen: false,
       boardsManagerOpen: false,
       settingsOpen: false,
+      archiveOpen: false,
       activeTaskId: null,
 
       setCurrentPage: (page) => set({ currentPage: page }),
@@ -163,6 +173,7 @@ export const useStore = create<StoreState>()(
       setCardFontSize: (size) => set({ cardFontSize: size }),
       setTheme: (theme) => set({ theme }),
       setPinboardZoom: (zoom) => set({ pinboardZoom: clampZoom(zoom) }),
+      setTodayZoom: (zoom) => set({ todayZoom: clampZoom(zoom) }),
       setKanbanZoom: (zoom) => set({ kanbanZoom: clampZoom(zoom) }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
       closePeopleManager: () => set({ peopleManagerOpen: false }),
@@ -170,6 +181,8 @@ export const useStore = create<StoreState>()(
       closeBoardsManager: () => set({ boardsManagerOpen: false }),
       openSettings: () => set({ settingsOpen: true }),
       closeSettings: () => set({ settingsOpen: false }),
+      openArchive: () => set({ archiveOpen: true }),
+      closeArchive: () => set({ archiveOpen: false }),
       setActiveTaskId: (id) => set({ activeTaskId: id }),
 
       addTask: (draft, position) => {
@@ -177,6 +190,7 @@ export const useStore = create<StoreState>()(
         const task: Task = {
           ...draft,
           id: nanoid(),
+          archived: draft.status === 'erledigt',
           page: 'pinboard',
           boardId: null,
           columnId: 'backlog',
@@ -194,7 +208,11 @@ export const useStore = create<StoreState>()(
 
       updateTask: (id, patch) =>
         set({
-          tasks: get().tasks.map((t) => (t.id === id ? { ...t, ...patch, updatedAt: now() } : t)),
+          tasks: get().tasks.map((t) =>
+            t.id === id
+              ? { ...t, ...patch, archived: patch.status === 'erledigt' ? true : t.archived, updatedAt: now() }
+              : t,
+          ),
         }),
 
       deleteTask: (id) => set({ tasks: get().tasks.filter((t) => t.id !== id) }),
@@ -253,6 +271,27 @@ export const useStore = create<StoreState>()(
         const order = tasks.filter((t) => t.boardId === boardId && t.columnId === columnId && t.id !== id).length
         set({
           tasks: tasks.map((t) => (t.id === id ? { ...t, page: 'board', boardId, order, updatedAt: now() } : t)),
+        })
+      },
+
+      restoreFromArchive: (id, status) => {
+        set({
+          tasks: get().tasks.map((t) =>
+            t.id === id
+              ? {
+                  ...t,
+                  status,
+                  archived: false,
+                  page: 'pinboard',
+                  boardId: null,
+                  columnId: 'backlog',
+                  x: 80 + Math.random() * 400,
+                  y: 80 + Math.random() * 300,
+                  updatedAt: now(),
+                }
+              : t,
+          ),
+          currentPage: 'pinboard',
         })
       },
 

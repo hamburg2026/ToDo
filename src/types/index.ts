@@ -1,6 +1,6 @@
-export type Page = 'pinboard' | 'board'
+export type Page = 'pinboard' | 'today' | 'board'
 
-export type AppView = 'pinboard' | 'board' | 'analytics'
+export type AppView = 'pinboard' | 'today' | 'board' | 'analytics'
 
 export type BoardView = 'kanban' | 'plan'
 
@@ -45,6 +45,7 @@ export interface Task {
   today: boolean
   important: boolean
   status: TaskStatus
+  archived: boolean
   page: Page
   boardId: string | null
   columnId: ColumnId
@@ -59,5 +60,5 @@ export interface Task {
 
 export type TaskDraft = Omit<
   Task,
-  'id' | 'createdAt' | 'updatedAt' | 'x' | 'y' | 'rotation' | 'page' | 'boardId' | 'columnId' | 'order'
+  'id' | 'createdAt' | 'updatedAt' | 'x' | 'y' | 'rotation' | 'page' | 'boardId' | 'columnId' | 'order' | 'archived'
 >

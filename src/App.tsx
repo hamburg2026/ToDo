@@ -14,6 +14,7 @@ import {
 import { arrayMove } from '@dnd-kit/sortable'
 import Header from './components/Header'
 import Pinboard from './components/Pinboard'
+import TodayBoard from './components/TodayBoard'
 import KanbanBoard from './components/KanbanBoard'
 import PlanView from './components/PlanView'
 import AnalyticsView from './components/AnalyticsView'
@@ -23,11 +24,12 @@ import TaskModal from './components/TaskModal'
 import PeopleManager from './components/PeopleManager'
 import BoardsManager from './components/BoardsManager'
 import SettingsPanel from './components/SettingsPanel'
+import ArchiveManager from './components/ArchiveManager'
 import TaskCard from './components/TaskCard'
 import { useStore } from './store/useStore'
 import { useApplyTheme } from './hooks/useApplyTheme'
 import { PINBOARD_CARD_HEIGHT, PINBOARD_CARD_WIDTH, PINBOARD_HEIGHT, PINBOARD_WIDTH } from './lib/constants'
-import type { ColumnId } from './types'
+import type { ColumnId, Page } from './types'
 
 const CARD_W = PINBOARD_CARD_WIDTH
 const CARD_H = PINBOARD_CARD_HEIGHT
@@ -61,6 +63,8 @@ export default function App() {
   const closeBoardsManager = useStore((s) => s.closeBoardsManager)
   const settingsOpen = useStore((s) => s.settingsOpen)
   const closeSettings = useStore((s) => s.closeSettings)
+  const archiveOpen = useStore((s) => s.archiveOpen)
+  const closeArchive = useStore((s) => s.closeArchive)
 
   const [modalTaskId, setModalTaskId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -105,21 +109,23 @@ export default function App() {
       return
     }
 
-    // Drag onto the left edge (only visible on the board page): back to the pinboard
+    // Drag onto an edge tab (e.g. "Zur Pinnwand" or "Heute zu tun"): move the
+    // task to whichever page that edge tab currently targets.
     if (typeof over?.id === 'string' && over.id.startsWith('edge-nav-')) {
+      const targetPage = (over.data.current as { target?: Page } | undefined)?.target ?? 'pinboard'
       const randX = 200 + Math.random() * 500
       const randY = 150 + Math.random() * 400
-      sendTaskToPage(task.id, 'pinboard', { x: randX, y: randY })
-      setCurrentPage('pinboard')
+      sendTaskToPage(task.id, targetPage, { x: randX, y: randY })
+      setCurrentPage(targetPage)
       return
     }
 
-    if (task.page === 'pinboard') {
-      // The pinboard canvas can be zoomed (see Pinboard.tsx), which scales
-      // on-screen pixels relative to the underlying, unscaled coordinate
-      // space that task.x/y live in — so the raw pointer delta needs to be
-      // un-scaled before it's applied to the stored position.
-      const zoom = useStore.getState().pinboardZoom
+    if (task.page === 'pinboard' || task.page === 'today') {
+      // The pinboard/today canvases can be zoomed (see Pinboard.tsx /
+      // TodayBoard.tsx), which scales on-screen pixels relative to the
+      // underlying, unscaled coordinate space that task.x/y live in — so the
+      // raw pointer delta needs to be un-scaled before it's applied.
+      const zoom = task.page === 'pinboard' ? useStore.getState().pinboardZoom : useStore.getState().todayZoom
       const nextX = Math.min(Math.max(0, task.x + delta.x / zoom), CANVAS_W - CARD_W)
       const nextY = Math.min(Math.max(0, task.y + delta.y / zoom), CANVAS_H - CARD_H)
       setTaskPosition(task.id, nextX, nextY)
@@ -176,6 +182,7 @@ export default function App() {
           <Header />
           <main className="relative z-0 flex-1 overflow-hidden">
             {currentPage === 'pinboard' && <Pinboard onCreate={openCreateModal} onEdit={openEditModal} />}
+            {currentPage === 'today' && <TodayBoard onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'kanban' && <KanbanBoard onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'plan' && <PlanView onEdit={openEditModal} />}
             {currentPage === 'analytics' && <AnalyticsView onEdit={openEditModal} />}
@@ -183,11 +190,23 @@ export default function App() {
         </div>
 
         <BoardTabs />
-        <EdgeZone side="left" label="Zur Pinnwand" active={currentPage === 'board'} />
+        <EdgeZone
+          side="left"
+          label={currentPage === 'pinboard' ? 'Heute zu tun' : 'Zur Pinnwand'}
+          target={currentPage === 'pinboard' ? 'today' : 'pinboard'}
+          active={currentPage === 'pinboard' || currentPage === 'today' || currentPage === 'board'}
+        />
 
         <DragOverlay style={{ zIndex: 9999 }}>
           {activeTask ? (
-            <div style={{ transform: activeTask.page === 'pinboard' ? `rotate(${activeTask.rotation}deg)` : undefined }}>
+            <div
+              style={{
+                transform:
+                  activeTask.page === 'pinboard' || activeTask.page === 'today'
+                    ? `rotate(${activeTask.rotation}deg)`
+                    : undefined,
+              }}
+            >
               <TaskCard task={activeTask} dragging />
             </div>
           ) : null}
@@ -206,6 +225,7 @@ export default function App() {
       {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
       {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
       {settingsOpen && <SettingsPanel onClose={closeSettings} />}
+      {archiveOpen && <ArchiveManager onClose={closeArchive} />}
     </DndContext>
   )
 }
