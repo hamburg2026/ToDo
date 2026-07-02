@@ -1,4 +1,4 @@
-import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock, Settings } from 'lucide-react'
+import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock, Settings, Layers } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 
@@ -7,8 +7,12 @@ export default function Header() {
   const setCurrentPage = useStore((s) => s.setCurrentPage)
   const boardView = useStore((s) => s.boardView)
   const setBoardView = useStore((s) => s.setBoardView)
+  const boards = useStore((s) => s.boards)
+  const activeBoardId = useStore((s) => s.activeBoardId)
   const openPeopleManager = useStore((s) => s.openPeopleManager)
+  const openBoardsManager = useStore((s) => s.openBoardsManager)
   const openSettings = useStore((s) => s.openSettings)
+  const activeBoard = boards.find((b) => b.id === activeBoardId)
 
   return (
     <header className="relative z-50 flex items-center justify-between px-6 py-4">
@@ -39,6 +43,13 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-3">
+        {currentPage === 'board' && activeBoard && (
+          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/70">
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: activeBoard.color }} />
+            {activeBoard.name}
+          </div>
+        )}
+
         {currentPage === 'board' && (
           <div className="flex items-center gap-1 rounded-full glass p-1">
             <button
@@ -65,6 +76,13 @@ export default function Header() {
           className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
         >
           <Users size={14} /> Personen
+        </button>
+
+        <button
+          onClick={openBoardsManager}
+          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
+        >
+          <Layers size={14} /> Boards
         </button>
 
         <BackupMenu />

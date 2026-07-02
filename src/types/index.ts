@@ -4,6 +4,8 @@ export type BoardView = 'kanban' | 'plan'
 
 export type CardFont = 'sans' | 'hand' | 'serif'
 
+export type CardFontSize = 'sm' | 'md' | 'lg'
+
 export type ColumnId = 'backlog' | 'progress' | 'review' | 'done'
 
 export interface Column {
@@ -19,6 +21,12 @@ export interface Person {
   initials: string
 }
 
+export interface Board {
+  id: string
+  name: string
+  color: string
+}
+
 export interface Task {
   id: string
   title: string
@@ -29,6 +37,7 @@ export interface Task {
   category: string
   hashtags: string[]
   page: Page
+  boardId: string | null
   columnId: ColumnId
   order: number
   x: number
@@ -41,5 +50,5 @@ export interface Task {
 
 export type TaskDraft = Omit<
   Task,
-  'id' | 'createdAt' | 'updatedAt' | 'x' | 'y' | 'rotation' | 'page' | 'columnId' | 'order'
+  'id' | 'createdAt' | 'updatedAt' | 'x' | 'y' | 'rotation' | 'page' | 'boardId' | 'columnId' | 'order'
 >

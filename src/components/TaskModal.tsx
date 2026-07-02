@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { X, Users, Hash } from 'lucide-react'
+import { X, Users, Hash, PenLine } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { CARD_COLORS, CATEGORIES } from '../lib/constants'
 import type { Task } from '../types'
+import HandwritingOverlay from './HandwritingOverlay'
 
 interface Props {
   taskId: string | null
@@ -26,6 +27,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
   const [hashtags, setHashtags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
   const [color, setColor] = useState(CARD_COLORS[0])
+  const [handwritingOpen, setHandwritingOpen] = useState(false)
 
   useEffect(() => {
     if (task) {
@@ -116,7 +118,16 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Beschreibung</label>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="text-xs font-semibold uppercase tracking-wide text-white/50">Beschreibung</label>
+              <button
+                type="button"
+                onClick={() => setHandwritingOpen(true)}
+                className="flex items-center gap-1 text-[11px] font-medium text-violet-300 hover:text-violet-200"
+              >
+                <PenLine size={12} /> Handschrift
+              </button>
+            </div>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -247,6 +258,26 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
           </button>
         </div>
       </form>
+
+      {handwritingOpen && (
+        <HandwritingOverlay
+          title="Beschreibung handschriftlich"
+          hint={
+            <>
+              Schreibe mit dem Apple&nbsp;Pencil direkt in das Feld – auf dem iPad wandelt <em>Scribble</em> deine
+              Handschrift automatisch in Text um.
+            </>
+          }
+          initialValue={description}
+          placeholder="Details, Kontext, Notizen…"
+          confirmLabel="Übernehmen"
+          onSave={(text) => {
+            setDescription(text)
+            setHandwritingOpen(false)
+          }}
+          onClose={() => setHandwritingOpen(false)}
+        />
+      )}
     </div>
   )
 }

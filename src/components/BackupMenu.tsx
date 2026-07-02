@@ -137,7 +137,7 @@ export default function BackupMenu() {
       {resetOpen && (
         <ConfirmDialog
           title="Taskwall zurücksetzen?"
-          message="Alle Aufgaben und Personen werden gelöscht und durch die Beispieldaten ersetzt. Erstelle vorher ein Backup, falls du deine Daten behalten möchtest."
+          message="Alle Aufgaben, Personen und Boards werden gelöscht und durch die Beispieldaten ersetzt. Erstelle vorher ein Backup, falls du deine Daten behalten möchtest."
           confirmLabel="Zurücksetzen"
           danger
           onConfirm={confirmReset}
