@@ -121,3 +121,16 @@ export function initialsOf(name: string): string {
 export function randomPick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
+
+export const ZOOM_MIN = 0.5
+export const ZOOM_MAX = 1.75
+export const ZOOM_STEP = 0.1
+
+export function clampZoom(zoom: number): number {
+  return Math.round(Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom)) * 100) / 100
+}
+
+export const PINBOARD_WIDTH = 2200
+export const PINBOARD_HEIGHT = 1400
+export const PINBOARD_CARD_WIDTH = 256
+export const PINBOARD_CARD_HEIGHT = 150

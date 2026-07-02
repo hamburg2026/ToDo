@@ -1,4 +1,5 @@
-import { CalendarRange, Pencil, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { CalendarDays, CalendarRange, ChevronDown, ChevronUp, Pencil, Star, Trash2 } from 'lucide-react'
 import type { Task } from '../types'
 import { useStore } from '../store/useStore'
 import { categoryColor, CARD_FONT_CLASSES, CARD_FONT_SIZE_CLASSES } from '../lib/constants'
@@ -19,6 +20,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
   const cardFontSize = useStore((s) => s.cardFontSize)
   const assignee = people.find((p) => p.id === task.assigneeId)
   const sizeClasses = CARD_FONT_SIZE_CLASSES[cardFontSize]
+  const [descOpen, setDescOpen] = useState(false)
 
   return (
     <div
@@ -33,7 +35,15 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       <div className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-white/70 shadow-sm ring-1 ring-black/10" />
 
       <div className="mb-1.5 flex items-start justify-between gap-2">
-        <h3 className={`${CARD_FONT_CLASSES[cardFont]} ${sizeClasses.title} font-medium leading-snug text-slate-900`}>{task.title}</h3>
+        <div className="flex min-w-0 items-start gap-1.5">
+          {(task.important || task.today) && (
+            <span className="mt-0.5 flex shrink-0 items-center gap-1">
+              {task.important && <Star size={13} className="fill-rose-600 text-rose-600" />}
+              {task.today && <CalendarDays size={13} className="text-slate-700" />}
+            </span>
+          )}
+          <h3 className={`${CARD_FONT_CLASSES[cardFont]} ${sizeClasses.title} font-medium leading-snug text-slate-900`}>{task.title}</h3>
+        </div>
         <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={(e) => {
@@ -59,7 +69,22 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       </div>
 
       {task.description && (
-        <p className={`mb-2 line-clamp-3 ${sizeClasses.description} leading-snug text-slate-800/80`}>{task.description}</p>
+        <div className="mb-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setDescOpen((v) => !v)
+            }}
+            className="flex items-center gap-1 text-slate-700/70 hover:text-slate-900"
+          >
+            {descOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            <span className="text-[10px] font-semibold uppercase tracking-wide">Details</span>
+          </button>
+          {descOpen && (
+            <p className={`mt-1 ${sizeClasses.description} leading-snug text-slate-800/80`}>{task.description}</p>
+          )}
+        </div>
       )}
 
       {task.hashtags.length > 0 && (

@@ -26,12 +26,13 @@ import SettingsPanel from './components/SettingsPanel'
 import TaskCard from './components/TaskCard'
 import { useStore } from './store/useStore'
 import { useApplyTheme } from './hooks/useApplyTheme'
+import { PINBOARD_CARD_HEIGHT, PINBOARD_CARD_WIDTH, PINBOARD_HEIGHT, PINBOARD_WIDTH } from './lib/constants'
 import type { ColumnId } from './types'
 
-const CARD_W = 256
-const CARD_H = 150
-const CANVAS_W = 2200
-const CANVAS_H = 1400
+const CARD_W = PINBOARD_CARD_WIDTH
+const CARD_H = PINBOARD_CARD_HEIGHT
+const CANVAS_W = PINBOARD_WIDTH
+const CANVAS_H = PINBOARD_HEIGHT
 
 // Prefer whatever droppable the pointer is literally over (correct for narrow
 // targets like the board tabs), falling back to rect overlap when the pointer
@@ -114,8 +115,13 @@ export default function App() {
     }
 
     if (task.page === 'pinboard') {
-      const nextX = Math.min(Math.max(0, task.x + delta.x), CANVAS_W - CARD_W)
-      const nextY = Math.min(Math.max(0, task.y + delta.y), CANVAS_H - CARD_H)
+      // The pinboard canvas can be zoomed (see Pinboard.tsx), which scales
+      // on-screen pixels relative to the underlying, unscaled coordinate
+      // space that task.x/y live in — so the raw pointer delta needs to be
+      // un-scaled before it's applied to the stored position.
+      const zoom = useStore.getState().pinboardZoom
+      const nextX = Math.min(Math.max(0, task.x + delta.x / zoom), CANVAS_W - CARD_W)
+      const nextY = Math.min(Math.max(0, task.y + delta.y / zoom), CANVAS_H - CARD_H)
       setTaskPosition(task.id, nextX, nextY)
       return
     }
