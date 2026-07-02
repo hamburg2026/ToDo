@@ -18,7 +18,7 @@ export default function Header() {
     <header className="relative z-50 flex items-center justify-between px-6 py-4">
       <div className="flex items-center gap-2.5">
         <img src={`${import.meta.env.BASE_URL}brand/ponturo-icon.svg`} alt="" className="h-9 w-9" />
-        <span className="text-lg font-extrabold tracking-tight text-[#151f76]">
+        <span className="text-lg tracking-tight text-[#151f76]">
           ponturo <span className="font-medium text-[#151f76]/60">Taskwall</span>
         </span>
       </div>
