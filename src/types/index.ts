@@ -8,7 +8,7 @@ export type CardFont = 'sans' | 'hand' | 'serif'
 
 export type CardFontSize = 'sm' | 'md' | 'lg'
 
-export type ThemeId = 'violet' | 'ocean' | 'sunset' | 'forest' | 'berry'
+export type ThemeId = 'blue' | 'teal' | 'purple' | 'navy'
 
 export type ColumnId = 'backlog' | 'progress' | 'review' | 'done'
 

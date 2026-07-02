@@ -28,21 +28,21 @@ export default function HandwritingOverlay({
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-2xl glass p-6 shadow-glow animate-pop-in"
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-lg font-bold text-white">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-[#151f76]">
             <PenLine size={18} className="text-violet-300" /> {title}
           </h2>
-          <button onClick={onClose} className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+          <button onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
             <X size={18} />
           </button>
         </div>
 
-        <p className="mb-3 text-sm leading-relaxed text-white/60">{hint}</p>
+        <p className="mb-3 text-sm leading-relaxed text-[#151f76]/65">{hint}</p>
 
         <textarea
           autoFocus
@@ -56,14 +56,14 @@ export default function HandwritingOverlay({
           }}
           rows={7}
           placeholder={placeholder}
-          className="w-full resize-none rounded-xl border border-white/10 bg-white/95 px-4 py-3 text-lg leading-relaxed text-slate-900 placeholder-slate-400 shadow-inner outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/40"
+          className="w-full resize-none rounded-xl border border-[#151f76]/10 bg-white/95 px-4 py-3 text-lg leading-relaxed text-slate-900 placeholder-slate-400 shadow-inner outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/40"
         />
 
         <div className="mt-4 flex justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white/70 hover:bg-white/10"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-[#151f76]/75 hover:bg-[#151f76]/6"
           >
             Abbrechen
           </button>

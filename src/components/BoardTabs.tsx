@@ -18,10 +18,10 @@ function BoardTab({ board, active, onClick }: TabProps) {
       title={board.name}
       className={`flex items-center gap-2 rounded-l-2xl border py-3 pl-3 pr-2 shadow-card transition-all ${
         isOver
-          ? 'scale-110 border-white/40 shadow-glow animate-pulse-edge'
+          ? 'scale-110 border-[#151f76]/30 shadow-glow animate-pulse-edge'
           : active
-            ? 'border-white/20'
-            : 'border-white/10 hover:border-white/20'
+            ? 'border-[#151f76]/15'
+            : 'border-[#151f76]/10 hover:border-[#151f76]/15'
       }`}
       style={{
         backgroundColor: active || isOver ? `${board.color}cc` : `${board.color}33`,

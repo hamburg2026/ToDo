@@ -19,7 +19,7 @@ export default function Pinboard({ onCreate, onEdit }: Props) {
     <div className="no-scrollbar relative h-full w-full overflow-auto bg-grid pr-16">
       <div className="relative" style={{ width: 2200, height: 1400 }}>
         {tasks.length === 0 && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white/40">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-[#151f76]/50">
             <p className={`mb-2 ${CARD_FONT_CLASSES[cardFont]} text-3xl`}>Deine Pinnwand ist leer</p>
             <p className="text-sm">Klicke auf „Neue Aufgabe“, um zu starten.</p>
           </div>
@@ -43,7 +43,7 @@ export default function Pinboard({ onCreate, onEdit }: Props) {
         <button
           onClick={() => setHandwritingOpen(true)}
           title="Handschriftlich erfassen (Apple Pencil)"
-          className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-3 font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
+          className="flex items-center gap-2 rounded-full border border-[#151f76]/12 bg-[#151f76]/6 px-4 py-3 font-semibold text-[#151f76] backdrop-blur transition-colors hover:bg-[#151f76]/10"
         >
           <PenLine size={17} />
           Handschrift

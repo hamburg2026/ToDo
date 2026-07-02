@@ -38,19 +38,19 @@ export default function BoardsManager({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-md rounded-2xl glass p-6 shadow-glow animate-pop-in"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">Boards verwalten</h2>
-          <button onClick={onClose} className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+          <h2 className="text-lg font-bold text-[#151f76]">Boards verwalten</h2>
+          <button onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
             <X size={18} />
           </button>
         </div>
 
-        <p className="mb-4 text-sm text-white/60">
+        <p className="mb-4 text-sm text-[#151f76]/65">
           Boards erscheinen als Laschen am rechten Bildrand. Ziehe eine Karte von der Pinnwand auf eine Lasche, um
           sie dorthin zu verschieben – z. B. für unterschiedliche Projekte oder ein privates Board.
         </p>
@@ -60,7 +60,7 @@ export default function BoardsManager({ onClose }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Name des Boards"
-            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
+            className="flex-1 rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
           />
           <button
             type="submit"
@@ -75,7 +75,7 @@ export default function BoardsManager({ onClose }: Props) {
             const count = tasks.filter((t) => t.boardId === b.id).length
             const isLast = boards.length <= 1
             return (
-              <div key={b.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <div key={b.id} className="flex items-center gap-3 rounded-xl border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2.5">
                 <div
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white"
                   style={{ backgroundColor: b.color }}
@@ -88,11 +88,11 @@ export default function BoardsManager({ onClose }: Props) {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                    className="flex-1 rounded-md border border-violet-400 bg-white/10 px-2 py-1 text-sm text-white outline-none"
+                    className="flex-1 rounded-md border border-violet-400 bg-[#151f76]/6 px-2 py-1 text-sm text-[#151f76] outline-none"
                   />
                 ) : (
                   <div className="flex-1">
-                    <p className="flex items-center gap-1.5 text-sm font-medium text-white/90">
+                    <p className="flex items-center gap-1.5 text-sm font-medium text-[#151f76]">
                       {b.name}
                       {b.id === activeBoardId && (
                         <span className="rounded-full bg-violet-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-violet-300">
@@ -100,16 +100,16 @@ export default function BoardsManager({ onClose }: Props) {
                         </span>
                       )}
                     </p>
-                    <p className="text-[11px] text-white/40">{count} Aufgabe{count === 1 ? '' : 'n'}</p>
+                    <p className="text-[11px] text-[#151f76]/50">{count} Aufgabe{count === 1 ? '' : 'n'}</p>
                   </div>
                 )}
 
                 {editingId === b.id ? (
-                  <button onClick={saveEdit} className="rounded-md p-1.5 text-emerald-300 hover:bg-white/10">
+                  <button onClick={saveEdit} className="rounded-md p-1.5 text-emerald-600 hover:bg-[#151f76]/6">
                     <Check size={15} />
                   </button>
                 ) : (
-                  <button onClick={() => startEdit(b.id, b.name)} className="rounded-md p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+                  <button onClick={() => startEdit(b.id, b.name)} className="rounded-md p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
                     <Pencil size={14} />
                   </button>
                 )}
@@ -117,7 +117,7 @@ export default function BoardsManager({ onClose }: Props) {
                   onClick={() => !isLast && deleteBoard(b.id)}
                   disabled={isLast}
                   title={isLast ? 'Mindestens ein Board muss bestehen bleiben' : 'Board löschen'}
-                  className="rounded-md p-1.5 text-white/50 hover:bg-red-500/20 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+                  className="rounded-md p-1.5 text-[#151f76]/55 hover:bg-red-500/20 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
                 >
                   <Trash2 size={14} />
                 </button>

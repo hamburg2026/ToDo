@@ -5,6 +5,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          blue: '#0073d2',
+          teal: '#16cbaf',
+          ice: '#f4f3fa',
+          purple: '#a60781',
+          navy: '#151f76',
+        },
         surface: {
           950: '#0a0a12',
           900: '#0f0f1a',
@@ -22,7 +29,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Montserrat', 'ui-sans-serif', 'system-ui', 'Arial', 'sans-serif'],
       },
       boxShadow: {
         glow: '0 0 40px -10px rgba(139, 92, 246, 0.45)',

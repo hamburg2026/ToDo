@@ -53,17 +53,17 @@ export default function PlanView({ onEdit }: Props) {
       <div className="flex-1 overflow-auto rounded-2xl glass">
         <div style={{ width: 220 + days.length * DAY_WIDTH }}>
           {/* Header */}
-          <div className="sticky top-0 z-10 flex border-b border-white/10 bg-surface-800/90 backdrop-blur">
-            <div className="w-[220px] shrink-0 border-r border-white/10 px-4 py-3 text-sm font-semibold text-white/70">
+          <div className="sticky top-0 z-10 flex border-b border-[#151f76]/10 bg-white/90 backdrop-blur">
+            <div className="w-[220px] shrink-0 border-r border-[#151f76]/10 px-4 py-3 text-sm font-semibold text-[#151f76]/75">
               Aufgabe
             </div>
             <div className="flex">
               {days.map((d, i) => (
                 <div
                   key={i}
-                  className={`flex w-11 shrink-0 flex-col items-center border-r border-white/5 py-2 text-[10px] ${
-                    i === todayIndex ? 'bg-violet-500/20 text-violet-200' : 'text-white/40'
-                  } ${d.getDay() === 0 || d.getDay() === 6 ? 'bg-white/[0.03]' : ''}`}
+                  className={`flex w-11 shrink-0 flex-col items-center border-r border-[#151f76]/8 py-2 text-[10px] ${
+                    i === todayIndex ? 'bg-violet-500/20 text-violet-200' : 'text-[#151f76]/50'
+                  } ${d.getDay() === 0 || d.getDay() === 6 ? 'bg-[#151f76]/[0.03]' : ''}`}
                 >
                   <span className="uppercase">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</span>
                   <span className="font-semibold">{d.getDate()}</span>
@@ -80,21 +80,21 @@ export default function PlanView({ onEdit }: Props) {
             const span = Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY_MS) + 1)
             const assignee = people.find((p) => p.id === task.assigneeId)
             return (
-              <div key={task.id} className="flex border-b border-white/5 hover:bg-white/[0.03]">
-                <div className="flex w-[220px] shrink-0 items-center gap-2 border-r border-white/10 px-4 py-3">
+              <div key={task.id} className="flex border-b border-[#151f76]/8 hover:bg-[#151f76]/[0.03]">
+                <div className="flex w-[220px] shrink-0 items-center gap-2 border-r border-[#151f76]/10 px-4 py-3">
                   <span
                     className="h-2 w-2 shrink-0 rounded-full"
                     style={{ backgroundColor: categoryColor(task.category) }}
                   />
-                  <span className="truncate text-sm text-white/85">{task.title}</span>
+                  <span className="truncate text-sm text-[#151f76]/90">{task.title}</span>
                 </div>
                 <div className="relative flex" style={{ width: days.length * DAY_WIDTH }}>
                   {days.map((d, i) => (
                     <div
                       key={i}
-                      className={`w-11 shrink-0 border-r border-white/5 ${
+                      className={`w-11 shrink-0 border-r border-[#151f76]/8 ${
                         i === todayIndex ? 'bg-violet-500/10' : ''
-                      } ${d.getDay() === 0 || d.getDay() === 6 ? 'bg-white/[0.03]' : ''}`}
+                      } ${d.getDay() === 0 || d.getDay() === 6 ? 'bg-[#151f76]/[0.03]' : ''}`}
                     />
                   ))}
                   <button
@@ -124,7 +124,7 @@ export default function PlanView({ onEdit }: Props) {
           })}
 
           {scheduled.length === 0 && (
-            <div className="flex h-32 items-center justify-center text-sm text-white/30">
+            <div className="flex h-32 items-center justify-center text-sm text-[#151f76]/40">
               Keine terminierten Aufgaben im Board. Vergib ein Zieldatum in der Aufgabe.
             </div>
           )}
@@ -133,7 +133,7 @@ export default function PlanView({ onEdit }: Props) {
 
       {unscheduled.length > 0 && (
         <div className="rounded-2xl glass p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">Ohne Zieldatum</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#151f76]/50">Ohne Zieldatum</p>
           <div className="flex flex-wrap gap-2">
             {unscheduled.map((task) => (
               <button

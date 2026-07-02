@@ -163,7 +163,9 @@ export default function App() {
       onDragEnd={handleDragEnd}
     >
       <div className="relative h-screen w-screen">
-        <div className="aurora-bg" />
+        <div className="aurora-bg">
+          <div className="brand-watermark" />
+        </div>
         <div className="flex h-full flex-col">
           <Header />
           <main className="relative z-0 flex-1 overflow-hidden">

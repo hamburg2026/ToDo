@@ -1,4 +1,4 @@
-import { LayoutGrid, PinIcon, Users, KanbanSquare, CalendarClock, Settings, Layers, BarChart3 } from 'lucide-react'
+import { PinIcon, Users, KanbanSquare, CalendarClock, Settings, Layers, BarChart3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 
@@ -17,17 +17,17 @@ export default function Header() {
   return (
     <header className="relative z-50 flex items-center justify-between px-6 py-4">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl accent-gradient shadow-glow">
-          <LayoutGrid size={18} className="text-white" />
-        </div>
-        <span className="text-lg font-extrabold tracking-tight text-white">Taskwall</span>
+        <img src={`${import.meta.env.BASE_URL}brand/ponturo-icon.svg`} alt="" className="h-9 w-9" />
+        <span className="text-lg font-extrabold tracking-tight text-[#151f76]">
+          ponturo <span className="font-medium text-[#151f76]/60">Taskwall</span>
+        </span>
       </div>
 
       <div className="flex items-center gap-2 rounded-full glass p-1">
         <button
           onClick={() => setCurrentPage('pinboard')}
           className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-            currentPage === 'pinboard' ? 'accent-gradient text-white shadow-glow' : 'text-white/60 hover:text-white'
+            currentPage === 'pinboard' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
           <PinIcon size={14} /> Pinnwand
@@ -35,7 +35,7 @@ export default function Header() {
         <button
           onClick={() => setCurrentPage('board')}
           className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-            currentPage === 'board' ? 'accent-gradient text-white shadow-glow' : 'text-white/60 hover:text-white'
+            currentPage === 'board' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
           <KanbanSquare size={14} /> Board
@@ -43,7 +43,7 @@ export default function Header() {
         <button
           onClick={() => setCurrentPage('analytics')}
           className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-            currentPage === 'analytics' ? 'accent-gradient text-white shadow-glow' : 'text-white/60 hover:text-white'
+            currentPage === 'analytics' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
           <BarChart3 size={14} /> Auswertung
@@ -52,7 +52,7 @@ export default function Header() {
 
       <div className="flex items-center gap-3">
         {currentPage === 'board' && activeBoard && (
-          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/70">
+          <div className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#151f76]/75">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: activeBoard.color }} />
             {activeBoard.name}
           </div>
@@ -63,7 +63,7 @@ export default function Header() {
             <button
               onClick={() => setBoardView('kanban')}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
-                boardView === 'kanban' ? 'bg-white/15 text-white' : 'text-white/50 hover:text-white'
+                boardView === 'kanban' ? 'bg-[#151f76]/10 text-[#151f76]' : 'text-[#151f76]/55 hover:text-[#151f76]'
               }`}
             >
               <KanbanSquare size={13} /> Kanban
@@ -71,7 +71,7 @@ export default function Header() {
             <button
               onClick={() => setBoardView('plan')}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
-                boardView === 'plan' ? 'bg-white/15 text-white' : 'text-white/50 hover:text-white'
+                boardView === 'plan' ? 'bg-[#151f76]/10 text-[#151f76]' : 'text-[#151f76]/55 hover:text-[#151f76]'
               }`}
             >
               <CalendarClock size={13} /> Plan
@@ -81,14 +81,14 @@ export default function Header() {
 
         <button
           onClick={openPeopleManager}
-          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
+          className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Users size={14} /> Personen
         </button>
 
         <button
           onClick={openBoardsManager}
-          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
+          className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Layers size={14} /> Boards
         </button>
@@ -98,7 +98,7 @@ export default function Header() {
         <button
           onClick={openSettings}
           aria-label="Einstellungen"
-          className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 p-2 text-white/80 transition-colors hover:bg-white/10"
+          className="flex items-center justify-center rounded-full border border-[#151f76]/10 bg-white/60 p-2 text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Settings size={16} />
         </button>
