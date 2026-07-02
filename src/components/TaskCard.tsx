@@ -33,7 +33,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       <div className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-white/70 shadow-sm ring-1 ring-black/10" />
 
       <div className="mb-1.5 flex items-start justify-between gap-2">
-        <h3 className={`${CARD_FONT_CLASSES[cardFont]} ${sizeClasses.title} font-bold leading-snug text-slate-900`}>{task.title}</h3>
+        <h3 className={`${CARD_FONT_CLASSES[cardFont]} ${sizeClasses.title} font-semibold leading-snug text-slate-900`}>{task.title}</h3>
         <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={(e) => {

@@ -71,7 +71,7 @@ export default function SettingsPanel({ onClose }: Props) {
                 }`}
               >
                 <div>
-                  <p className={`${CARD_FONT_CLASSES[option.id]} text-xl font-bold text-[#151f76]`}>Aufgabe erledigen</p>
+                  <p className={`${CARD_FONT_CLASSES[option.id]} text-xl font-semibold text-[#151f76]`}>Aufgabe erledigen</p>
                   <p className="mt-0.5 text-xs text-[#151f76]/55">
                     {option.label} · {option.hint}
                   </p>
@@ -100,7 +100,7 @@ export default function SettingsPanel({ onClose }: Props) {
                   active ? 'border-violet-400 bg-violet-500/15' : 'border-[#151f76]/10 bg-[#151f76]/4 hover:bg-[#151f76]/6'
                 }`}
               >
-                <span className={`${CARD_FONT_CLASSES[cardFont]} ${CARD_FONT_SIZE_CLASSES[option.id].title} font-bold text-[#151f76]`}>
+                <span className={`${CARD_FONT_CLASSES[cardFont]} ${CARD_FONT_SIZE_CLASSES[option.id].title} font-semibold text-[#151f76]`}>
                   Aa
                 </span>
                 <span className="text-xs text-[#151f76]/65">{option.label}</span>
