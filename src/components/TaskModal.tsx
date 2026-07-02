@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { X, Users, Hash, PenLine, CalendarDays, Star } from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { CARD_COLORS, CATEGORIES, categoryColor } from '../lib/constants'
-import type { Task } from '../types'
+import { CARD_COLORS, CATEGORIES, STATUS_OPTIONS, categoryColor } from '../lib/constants'
+import type { Task, TaskStatus } from '../types'
 import HandwritingOverlay from './HandwritingOverlay'
 
 interface Props {
@@ -29,6 +29,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
   const [color, setColor] = useState(CARD_COLORS[0])
   const [today, setToday] = useState(false)
   const [important, setImportant] = useState(false)
+  const [status, setStatus] = useState<TaskStatus>('none')
   const [handwritingOpen, setHandwritingOpen] = useState(false)
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
       setColor(task.color)
       setToday(task.today ?? false)
       setImportant(task.important ?? false)
+      setStatus(task.status ?? 'none')
     } else {
       setTitle('')
       setDescription('')
@@ -54,6 +56,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
       setColor(CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)])
       setToday(false)
       setImportant(false)
+      setStatus('none')
     }
     setTagInput('')
   }, [task, taskId])
@@ -89,6 +92,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
       color,
       today,
       important,
+      status,
     }
     if (task) {
       updateTask(task.id, payload as Partial<Task>)
@@ -267,6 +271,38 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
                 <Star size={14} className={important ? 'fill-rose-600' : ''} />
                 Wichtig
               </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Status</label>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setStatus('none')}
+                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  status === 'none'
+                    ? 'border-[#151f76]/30 bg-[#151f76]/8 text-[#151f76]'
+                    : 'border-[#151f76]/10 bg-[#151f76]/4 text-[#151f76]/55 hover:bg-[#151f76]/6'
+                }`}
+              >
+                Kein Status
+              </button>
+              {STATUS_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setStatus(option.id)}
+                  className="rounded-full border px-3 py-1.5 text-sm font-semibold transition-transform hover:scale-105"
+                  style={
+                    status === option.id
+                      ? { borderColor: option.color, backgroundColor: `${option.color}22`, color: option.color }
+                      : { borderColor: `${option.color}33`, backgroundColor: 'transparent', color: `${option.color}99` }
+                  }
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
 

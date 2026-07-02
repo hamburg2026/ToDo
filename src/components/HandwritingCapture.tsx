@@ -31,6 +31,7 @@ export default function HandwritingCapture({ onClose }: Props) {
       hashtags: [],
       today: false,
       important: false,
+      status: 'none',
       color: randomPick(CARD_COLORS),
     })
     onClose()

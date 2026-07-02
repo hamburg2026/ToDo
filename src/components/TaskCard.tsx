@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CalendarDays, CalendarRange, ChevronDown, ChevronUp, Pencil, Star, Trash2 } from 'lucide-react'
 import type { Task } from '../types'
 import { useStore } from '../store/useStore'
-import { categoryColor, CARD_FONT_CLASSES, CARD_FONT_SIZE_CLASSES } from '../lib/constants'
+import { categoryColor, statusOption, CARD_FONT_CLASSES, CARD_FONT_SIZE_CLASSES } from '../lib/constants'
 import { formatDate } from '../lib/date'
 
 interface Props {
@@ -21,6 +21,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
   const assignee = people.find((p) => p.id === task.assigneeId)
   const sizeClasses = CARD_FONT_SIZE_CLASSES[cardFontSize]
   const [descOpen, setDescOpen] = useState(false)
+  const status = task.status && task.status !== 'none' ? statusOption(task.status) : null
 
   return (
     <div
@@ -33,6 +34,15 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       }}
     >
       <div className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-white/70 shadow-sm ring-1 ring-black/10" />
+
+      {status && (
+        <div
+          className="pointer-events-none absolute -top-2.5 -right-2.5 z-10 rotate-6 select-none rounded-md border-2 bg-white/85 px-1.5 py-0.5 text-[9px] font-extrabold uppercase leading-none tracking-wider shadow-sm"
+          style={{ borderColor: status.color, color: status.color }}
+        >
+          {status.label}
+        </div>
+      )}
 
       <div className="mb-1.5 flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-start gap-1.5">

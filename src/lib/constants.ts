@@ -1,4 +1,4 @@
-import type { CardFont, CardFontSize, Column, ThemeId } from '../types'
+import type { CardFont, CardFontSize, Column, TaskStatus, ThemeId } from '../types'
 
 export const COLUMNS: Column[] = [
   { id: 'backlog', title: 'Backlog', accent: '#151f76' },
@@ -6,6 +6,23 @@ export const COLUMNS: Column[] = [
   { id: 'review', title: 'Review', accent: '#a60781' },
   { id: 'done', title: 'Erledigt', accent: '#16cbaf' },
 ]
+
+export interface StatusOption {
+  id: TaskStatus
+  label: string
+  color: string
+}
+
+export const STATUS_OPTIONS: StatusOption[] = [
+  { id: 'offen', label: 'Offen', color: '#0073d2' },
+  { id: 'in-arbeit', label: 'In Arbeit', color: '#a60781' },
+  { id: 'erledigt', label: 'Erledigt', color: '#16a34a' },
+  { id: 'blockiert', label: 'Blockiert', color: '#e11d48' },
+]
+
+export function statusOption(id: TaskStatus): StatusOption | null {
+  return STATUS_OPTIONS.find((s) => s.id === id) ?? null
+}
 
 export const CATEGORIES: { name: string; color: string }[] = [
   { name: 'Arbeit', color: '#8b5cf6' },
