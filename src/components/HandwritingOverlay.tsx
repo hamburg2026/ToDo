@@ -71,7 +71,7 @@ export default function HandwritingOverlay({
             type="button"
             disabled={!text.trim()}
             onClick={handleSave}
-            className="rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+            className="rounded-lg accent-gradient px-5 py-2 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
           >
             {confirmLabel}
           </button>

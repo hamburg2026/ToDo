@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft } from '../types'
+import type { Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, ThemeId } from '../types'
 import { BOARD_COLORS, CARD_COLORS, PERSON_COLORS, initialsOf, randomPick } from '../lib/constants'
 
 interface StoreState {
@@ -13,6 +13,7 @@ interface StoreState {
   boardView: BoardView
   cardFont: CardFont
   cardFontSize: CardFontSize
+  theme: ThemeId
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
   settingsOpen: boolean
@@ -22,6 +23,7 @@ interface StoreState {
   setBoardView: (view: BoardView) => void
   setCardFont: (font: CardFont) => void
   setCardFontSize: (size: CardFontSize) => void
+  setTheme: (theme: ThemeId) => void
   openPeopleManager: () => void
   closePeopleManager: () => void
   openBoardsManager: () => void
@@ -64,6 +66,7 @@ interface BackupPayload {
   activeBoardId: string
   cardFont: CardFont
   cardFontSize: CardFontSize
+  theme: ThemeId
 }
 
 const seedPeople: Person[] = [
@@ -136,6 +139,7 @@ export const useStore = create<StoreState>()(
       boardView: 'kanban',
       cardFont: 'sans',
       cardFontSize: 'md',
+      theme: 'violet',
       peopleManagerOpen: false,
       boardsManagerOpen: false,
       settingsOpen: false,
@@ -145,6 +149,7 @@ export const useStore = create<StoreState>()(
       setBoardView: (view) => set({ boardView: view }),
       setCardFont: (font) => set({ cardFont: font }),
       setCardFontSize: (size) => set({ cardFontSize: size }),
+      setTheme: (theme) => set({ theme }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
       closePeopleManager: () => set({ peopleManagerOpen: false }),
       openBoardsManager: () => set({ boardsManagerOpen: true }),
@@ -305,6 +310,7 @@ export const useStore = create<StoreState>()(
           activeBoardId: get().activeBoardId,
           cardFont: get().cardFont,
           cardFontSize: get().cardFontSize,
+          theme: get().theme,
         }
         return JSON.stringify(payload, null, 2)
       },
@@ -353,6 +359,7 @@ export const useStore = create<StoreState>()(
           activeBoardId,
           cardFont: payload.cardFont ?? get().cardFont,
           cardFontSize: payload.cardFontSize ?? get().cardFontSize,
+          theme: payload.theme ?? get().theme,
           currentPage: 'pinboard',
           activeTaskId: null,
         })

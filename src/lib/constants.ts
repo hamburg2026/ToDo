@@ -1,4 +1,4 @@
-import type { CardFont, CardFontSize, Column } from '../types'
+import type { CardFont, CardFontSize, Column, ThemeId } from '../types'
 
 export const COLUMNS: Column[] = [
   { id: 'backlog', title: 'Backlog', accent: '#8b5cf6' },
@@ -70,6 +70,35 @@ export const CARD_FONT_SIZE_OPTIONS: { id: CardFontSize; label: string }[] = [
   { id: 'md', label: 'Normal' },
   { id: 'lg', label: 'Groß' },
 ]
+
+export interface Theme {
+  id: ThemeId
+  label: string
+  accentFrom: string
+  accentTo: string
+  auroraFrom: string
+  auroraTo: string
+}
+
+export const THEMES: Theme[] = [
+  { id: 'violet', label: 'Violett', accentFrom: '#8b5cf6', accentTo: '#d946ef', auroraFrom: '#8b5cf6', auroraTo: '#22d3ee' },
+  { id: 'ocean', label: 'Ozean', accentFrom: '#0ea5e9', accentTo: '#22d3ee', auroraFrom: '#0ea5e9', auroraTo: '#34d399' },
+  { id: 'sunset', label: 'Sonnenuntergang', accentFrom: '#f97316', accentTo: '#f43f5e', auroraFrom: '#f97316', auroraTo: '#f43f5e' },
+  { id: 'forest', label: 'Wald', accentFrom: '#10b981', accentTo: '#14b8a6', auroraFrom: '#10b981', auroraTo: '#0ea5e9' },
+  { id: 'berry', label: 'Beere', accentFrom: '#ec4899', accentTo: '#8b5cf6', auroraFrom: '#ec4899', auroraTo: '#8b5cf6' },
+]
+
+export function themeById(id: ThemeId): Theme {
+  return THEMES.find((t) => t.id === id) ?? THEMES[0]
+}
+
+export function hexToRgbTriplet(hex: string): string {
+  const clean = hex.replace('#', '')
+  const r = parseInt(clean.slice(0, 2), 16)
+  const g = parseInt(clean.slice(2, 4), 16)
+  const b = parseInt(clean.slice(4, 6), 16)
+  return `${r} ${g} ${b}`
+}
 
 export function categoryColor(name: string): string {
   const found = CATEGORIES.find((c) => c.name.toLowerCase() === name?.toLowerCase())

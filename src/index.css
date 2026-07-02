@@ -48,7 +48,7 @@ body {
   height: 55vmax;
   top: -20vmax;
   left: -10vmax;
-  background: radial-gradient(circle at 30% 30%, #8b5cf6, transparent 65%);
+  background: radial-gradient(circle at 30% 30%, var(--aurora-from, #8b5cf6), transparent 65%);
   animation: drift1 22s ease-in-out infinite alternate;
 }
 
@@ -57,7 +57,7 @@ body {
   height: 60vmax;
   bottom: -25vmax;
   right: -15vmax;
-  background: radial-gradient(circle at 70% 70%, #22d3ee, transparent 65%);
+  background: radial-gradient(circle at 70% 70%, var(--aurora-to, #22d3ee), transparent 65%);
   animation: drift2 26s ease-in-out infinite alternate;
 }
 
@@ -106,4 +106,79 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* --- Selectable color theme -------------------------------------------- */
+/* Themed by JS (useApplyTheme) setting --accent-from/--accent-to/--accent-rgb/
+   --aurora-from/--aurora-to on :root. These rules re-declare the specific
+   Tailwind utility classes used for the app's brand accent so every existing
+   usage repaints without touching each component. */
+
+.shadow-glow {
+  box-shadow: 0 0 40px -10px rgb(var(--accent-rgb, 139 92 246) / 0.45);
+}
+
+.accent-gradient {
+  background-image: linear-gradient(to right, var(--accent-from, #8b5cf6), var(--accent-to, #d946ef));
+}
+
+.border-violet-400,
+.focus\:border-violet-400:focus,
+.focus-within\:border-violet-400:focus-within {
+  border-color: var(--accent-from, #8b5cf6);
+}
+
+.border-violet-300\/70 {
+  border-color: rgb(var(--accent-rgb, 139 92 246) / 0.7);
+}
+
+.focus\:ring-violet-400\/30:focus,
+.focus-within\:ring-violet-400\/30:focus-within {
+  --tw-ring-color: rgb(var(--accent-rgb, 139 92 246) / 0.3);
+}
+
+.focus\:ring-violet-400\/40:focus {
+  --tw-ring-color: rgb(var(--accent-rgb, 139 92 246) / 0.4);
+}
+
+.bg-violet-500 {
+  background-color: var(--accent-from, #8b5cf6);
+}
+.bg-violet-500\/10 {
+  background-color: rgb(var(--accent-rgb, 139 92 246) / 0.1);
+}
+.bg-violet-500\/15 {
+  background-color: rgb(var(--accent-rgb, 139 92 246) / 0.15);
+}
+.bg-violet-500\/20 {
+  background-color: rgb(var(--accent-rgb, 139 92 246) / 0.2);
+}
+.bg-violet-500\/25 {
+  background-color: rgb(var(--accent-rgb, 139 92 246) / 0.25);
+}
+.bg-violet-500\/30 {
+  background-color: rgb(var(--accent-rgb, 139 92 246) / 0.3);
+}
+
+.from-violet-500,
+.from-violet-600 {
+  --tw-gradient-from: var(--accent-from, #8b5cf6) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(var(--accent-rgb, 139 92 246) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.from-violet-600\/40 {
+  --tw-gradient-from: rgb(var(--accent-rgb, 139 92 246) / 0.4) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(var(--accent-rgb, 139 92 246) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.text-violet-300 {
+  color: color-mix(in srgb, var(--accent-from, #8b5cf6) 75%, white);
+}
+.text-violet-200,
+.hover\:text-violet-200:hover {
+  color: color-mix(in srgb, var(--accent-from, #8b5cf6) 50%, white);
+}
+.text-violet-100 {
+  color: color-mix(in srgb, var(--accent-from, #8b5cf6) 25%, white);
 }

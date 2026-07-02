@@ -24,6 +24,7 @@ import BoardsManager from './components/BoardsManager'
 import SettingsPanel from './components/SettingsPanel'
 import TaskCard from './components/TaskCard'
 import { useStore } from './store/useStore'
+import { useApplyTheme } from './hooks/useApplyTheme'
 import type { ColumnId } from './types'
 
 const CARD_W = 256
@@ -40,6 +41,7 @@ const collisionDetection: CollisionDetection = (args) => {
 }
 
 export default function App() {
+  useApplyTheme()
   const currentPage = useStore((s) => s.currentPage)
   const setCurrentPage = useStore((s) => s.setCurrentPage)
   const boardView = useStore((s) => s.boardView)
