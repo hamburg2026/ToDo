@@ -60,9 +60,9 @@ export const CARD_FONT_OPTIONS: { id: CardFont; label: string; hint: string }[] 
 ]
 
 export const CARD_FONT_SIZE_CLASSES: Record<CardFontSize, { title: string; description: string }> = {
-  sm: { title: 'text-base', description: 'text-xs' },
-  md: { title: 'text-lg', description: 'text-[13px]' },
-  lg: { title: 'text-xl', description: 'text-sm' },
+  sm: { title: 'text-sm', description: 'text-xs' },
+  md: { title: 'text-base', description: 'text-[13px]' },
+  lg: { title: 'text-lg', description: 'text-sm' },
 }
 
 export const CARD_FONT_SIZE_OPTIONS: { id: CardFontSize; label: string }[] = [
