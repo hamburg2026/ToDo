@@ -18,7 +18,7 @@ function startOfDay(d: Date) {
 
 export default function PlanView({ onEdit }: Props) {
   const activeBoardId = useStore((s) => s.activeBoardId)
-  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId)
+  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId && !t.archived)
   const people = useStore((s) => s.people)
 
   // A task only needs a Zieldatum (end date) to appear in the plan; the start

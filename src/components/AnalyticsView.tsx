@@ -1,4 +1,4 @@
-import { AlertTriangle, LayoutDashboard, PinIcon, Users } from 'lucide-react'
+import { AlertTriangle, CalendarCheck2, LayoutDashboard, PinIcon, Users } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { COLUMNS, categoryColor } from '../lib/constants'
 import { formatDate, daysUntil } from '../lib/date'
@@ -50,7 +50,9 @@ function StatTile({ label, value, tone }: { label: string; value: number; tone?:
 }
 
 export default function AnalyticsView({ onEdit }: Props) {
-  const tasks = useStore((s) => s.tasks)
+  const allTasks = useStore((s) => s.tasks)
+  const tasks = allTasks.filter((t) => !t.archived)
+  const archivedCount = allTasks.filter((t) => t.archived).length
   const people = useStore((s) => s.people)
   const boards = useStore((s) => s.boards)
 
@@ -65,6 +67,7 @@ export default function AnalyticsView({ onEdit }: Props) {
 
   const boardCounts = [
     { key: 'pinboard', label: 'Pinnwand', color: '#94a3b8', count: tasks.filter((t) => t.page === 'pinboard').length },
+    { key: 'today', label: 'Heute zu tun', color: '#0073d2', count: tasks.filter((t) => t.page === 'today').length },
     ...boards.map((b) => ({ key: b.id, label: b.name, color: b.color, count: tasks.filter((t) => t.page === 'board' && t.boardId === b.id).length })),
   ].sort((a, b) => b.count - a.count)
   const maxBoardCount = Math.max(1, ...boardCounts.map((b) => b.count))
@@ -86,10 +89,11 @@ export default function AnalyticsView({ onEdit }: Props) {
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto pl-6 pr-24 py-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label="Gesamt Aufgaben" value={tasks.length} />
         <StatTile label="Überfällig" value={overdue.length} tone="danger" />
         <StatTile label="Erledigt" value={doneCount} />
+        <StatTile label="Archiviert" value={archivedCount} />
         <StatTile label="Personen" value={people.length} />
         <StatTile label="Boards" value={boards.length} />
       </div>
@@ -131,6 +135,8 @@ export default function AnalyticsView({ onEdit }: Props) {
                 icon={
                   b.key === 'pinboard' ? (
                     <PinIcon size={14} className="shrink-0 text-[#151f76]/50" />
+                  ) : b.key === 'today' ? (
+                    <CalendarCheck2 size={14} className="shrink-0 text-[#151f76]/50" />
                   ) : (
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: b.color }} />
                   )

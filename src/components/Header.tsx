@@ -1,4 +1,4 @@
-import { PinIcon, Users, KanbanSquare, CalendarClock, Settings, Layers, BarChart3 } from 'lucide-react'
+import { PinIcon, Users, KanbanSquare, CalendarClock, CalendarCheck2, Settings, Layers, Archive, BarChart3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 
@@ -12,6 +12,8 @@ export default function Header() {
   const openPeopleManager = useStore((s) => s.openPeopleManager)
   const openBoardsManager = useStore((s) => s.openBoardsManager)
   const openSettings = useStore((s) => s.openSettings)
+  const openArchive = useStore((s) => s.openArchive)
+  const archivedCount = useStore((s) => s.tasks.filter((t) => t.archived).length)
   const activeBoard = boards.find((b) => b.id === activeBoardId)
 
   return (
@@ -31,6 +33,14 @@ export default function Header() {
           }`}
         >
           <PinIcon size={14} /> Pinnwand
+        </button>
+        <button
+          onClick={() => setCurrentPage('today')}
+          className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+            currentPage === 'today' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
+          }`}
+        >
+          <CalendarCheck2 size={14} /> Heute zu tun
         </button>
         <button
           onClick={() => setCurrentPage('board')}
@@ -91,6 +101,20 @@ export default function Header() {
           className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Layers size={14} /> Boards
+        </button>
+
+        <button
+          onClick={openArchive}
+          aria-label="Archiv"
+          title="Archiv"
+          className="relative flex items-center justify-center rounded-full border border-[#151f76]/10 bg-white/60 p-2 text-[#151f76]/80 transition-colors hover:bg-white/90"
+        >
+          <Archive size={16} />
+          {archivedCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+              {archivedCount}
+            </span>
+          )}
         </button>
 
         <BackupMenu />

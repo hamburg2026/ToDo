@@ -1,16 +1,24 @@
 import { useDroppable } from '@dnd-kit/core'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import type { Page } from '../types'
 
 interface Props {
   side: 'left' | 'right'
   label: string
   active: boolean
+  target: Page
 }
 
-export default function EdgeZone({ side, label, active }: Props) {
+export default function EdgeZone({ side, label, active, target }: Props) {
+  // The droppable id stays stable across renders (based on side only) so
+  // dnd-kit keeps a continuously-measured rect for it; the actual
+  // destination page — which can change while the same zone stays mounted,
+  // e.g. Pinnwand <-> "Heute zu tun" — travels via `data` instead, read at
+  // drop time in App.tsx. Re-keying the id itself caused the zone to
+  // silently stop registering hits right after the target changed.
   const { setNodeRef, isOver } = useDroppable({
     id: `edge-nav-${side}`,
-    data: { side },
+    data: { side, target },
     disabled: !active,
   })
 
