@@ -139,7 +139,7 @@ export const useStore = create<StoreState>()(
       boardView: 'kanban',
       cardFont: 'sans',
       cardFontSize: 'md',
-      theme: 'violet',
+      theme: 'blue',
       peopleManagerOpen: false,
       boardsManagerOpen: false,
       settingsOpen: false,

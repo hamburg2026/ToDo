@@ -1,10 +1,10 @@
 import type { CardFont, CardFontSize, Column, ThemeId } from '../types'
 
 export const COLUMNS: Column[] = [
-  { id: 'backlog', title: 'Backlog', accent: '#8b5cf6' },
-  { id: 'progress', title: 'In Arbeit', accent: '#22d3ee' },
-  { id: 'review', title: 'Review', accent: '#f59e0b' },
-  { id: 'done', title: 'Erledigt', accent: '#34d399' },
+  { id: 'backlog', title: 'Backlog', accent: '#151f76' },
+  { id: 'progress', title: 'In Arbeit', accent: '#0073d2' },
+  { id: 'review', title: 'Review', accent: '#a60781' },
+  { id: 'done', title: 'Erledigt', accent: '#16cbaf' },
 ]
 
 export const CATEGORIES: { name: string; color: string }[] = [
@@ -81,11 +81,10 @@ export interface Theme {
 }
 
 export const THEMES: Theme[] = [
-  { id: 'violet', label: 'Violett', accentFrom: '#8b5cf6', accentTo: '#d946ef', auroraFrom: '#8b5cf6', auroraTo: '#22d3ee' },
-  { id: 'ocean', label: 'Ozean', accentFrom: '#0ea5e9', accentTo: '#22d3ee', auroraFrom: '#0ea5e9', auroraTo: '#34d399' },
-  { id: 'sunset', label: 'Sonnenuntergang', accentFrom: '#f97316', accentTo: '#f43f5e', auroraFrom: '#f97316', auroraTo: '#f43f5e' },
-  { id: 'forest', label: 'Wald', accentFrom: '#10b981', accentTo: '#14b8a6', auroraFrom: '#10b981', auroraTo: '#0ea5e9' },
-  { id: 'berry', label: 'Beere', accentFrom: '#ec4899', accentTo: '#8b5cf6', auroraFrom: '#ec4899', auroraTo: '#8b5cf6' },
+  { id: 'blue', label: 'Mittelblau', accentFrom: '#0073d2', accentTo: '#16cbaf', auroraFrom: '#0073d2', auroraTo: '#16cbaf' },
+  { id: 'teal', label: 'Cyan-Grün', accentFrom: '#16cbaf', accentTo: '#0073d2', auroraFrom: '#16cbaf', auroraTo: '#151f76' },
+  { id: 'purple', label: 'Purple', accentFrom: '#a60781', accentTo: '#0073d2', auroraFrom: '#a60781', auroraTo: '#16cbaf' },
+  { id: 'navy', label: 'Dunkelblau', accentFrom: '#151f76', accentTo: '#0073d2', auroraFrom: '#151f76', auroraTo: '#16cbaf' },
 ]
 
 export function themeById(id: ThemeId): Theme {

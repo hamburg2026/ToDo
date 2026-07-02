@@ -15,20 +15,20 @@ export default function SettingsPanel({ onClose }: Props) {
   const setTheme = useStore((s) => s.setTheme)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">Einstellungen</h2>
-          <button onClick={onClose} className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+          <h2 className="text-lg font-bold text-[#151f76]">Einstellungen</h2>
+          <button onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
             <X size={18} />
           </button>
         </div>
 
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">Farbdesign</p>
-        <p className="mb-3 text-sm text-white/60">Bestimmt die Akzentfarbe von Buttons, Hintergrund und Leuchteffekten.</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Farbdesign</p>
+        <p className="mb-3 text-sm text-[#151f76]/65">Bestimmt die Akzentfarbe von Buttons, Hintergrund und Leuchteffekten.</p>
 
         <div className="mb-5 grid grid-cols-3 gap-2 sm:grid-cols-5">
           {THEMES.map((t) => {
@@ -39,7 +39,7 @@ export default function SettingsPanel({ onClose }: Props) {
                 onClick={() => setTheme(t.id)}
                 title={t.label}
                 className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 transition-colors ${
-                  active ? 'border-white/40 bg-white/10' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                  active ? 'border-[#151f76]/30 bg-[#151f76]/6' : 'border-[#151f76]/10 bg-[#151f76]/4 hover:bg-[#151f76]/6'
                 }`}
               >
                 <span
@@ -48,14 +48,14 @@ export default function SettingsPanel({ onClose }: Props) {
                 >
                   {active && <Check size={14} className="text-white drop-shadow" />}
                 </span>
-                <span className="text-[11px] text-white/60">{t.label}</span>
+                <span className="text-[11px] text-[#151f76]/65">{t.label}</span>
               </button>
             )
           })}
         </div>
 
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/50">Kartenschrift</p>
-        <p className="mb-3 text-sm text-white/60">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Kartenschrift</p>
+        <p className="mb-3 text-sm text-[#151f76]/65">
           Bestimmt die Schriftart für die Aufgabentitel auf den Kacheln.
         </p>
 
@@ -67,12 +67,12 @@ export default function SettingsPanel({ onClose }: Props) {
                 key={option.id}
                 onClick={() => setCardFont(option.id)}
                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors ${
-                  active ? 'border-violet-400 bg-violet-500/15' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                  active ? 'border-violet-400 bg-violet-500/15' : 'border-[#151f76]/10 bg-[#151f76]/4 hover:bg-[#151f76]/6'
                 }`}
               >
                 <div>
-                  <p className={`${CARD_FONT_CLASSES[option.id]} text-xl font-bold text-white`}>Aufgabe erledigen</p>
-                  <p className="mt-0.5 text-xs text-white/50">
+                  <p className={`${CARD_FONT_CLASSES[option.id]} text-xl font-bold text-[#151f76]`}>Aufgabe erledigen</p>
+                  <p className="mt-0.5 text-xs text-[#151f76]/55">
                     {option.label} · {option.hint}
                   </p>
                 </div>
@@ -86,8 +86,8 @@ export default function SettingsPanel({ onClose }: Props) {
           })}
         </div>
 
-        <p className="mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-white/50">Schriftgröße</p>
-        <p className="mb-3 text-sm text-white/60">Bestimmt, wie groß Titel und Text auf den Kacheln erscheinen.</p>
+        <p className="mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Schriftgröße</p>
+        <p className="mb-3 text-sm text-[#151f76]/65">Bestimmt, wie groß Titel und Text auf den Kacheln erscheinen.</p>
 
         <div className="grid grid-cols-3 gap-2">
           {CARD_FONT_SIZE_OPTIONS.map((option) => {
@@ -97,13 +97,13 @@ export default function SettingsPanel({ onClose }: Props) {
                 key={option.id}
                 onClick={() => setCardFontSize(option.id)}
                 className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 transition-colors ${
-                  active ? 'border-violet-400 bg-violet-500/15' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                  active ? 'border-violet-400 bg-violet-500/15' : 'border-[#151f76]/10 bg-[#151f76]/4 hover:bg-[#151f76]/6'
                 }`}
               >
-                <span className={`${CARD_FONT_CLASSES[cardFont]} ${CARD_FONT_SIZE_CLASSES[option.id].title} font-bold text-white`}>
+                <span className={`${CARD_FONT_CLASSES[cardFont]} ${CARD_FONT_SIZE_CLASSES[option.id].title} font-bold text-[#151f76]`}>
                   Aa
                 </span>
-                <span className="text-xs text-white/60">{option.label}</span>
+                <span className="text-xs text-[#151f76]/65">{option.label}</span>
               </button>
             )
           })}

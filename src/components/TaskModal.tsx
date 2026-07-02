@@ -91,35 +91,35 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
         className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">{task ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2>
-          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+          <h2 className="text-lg font-bold text-[#151f76]">{task ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2>
+          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
             <X size={18} />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Titel</label>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Titel</label>
             <input
               autoFocus
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Was ist zu tun?"
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
+              className="w-full rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
             />
           </div>
 
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wide text-white/50">Beschreibung</label>
+              <label className="text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Beschreibung</label>
               <button
                 type="button"
                 onClick={() => setHandwritingOpen(true)}
@@ -133,14 +133,14 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Details, Kontext, Notizen…"
-              className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
+              className="w-full resize-none rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0">
               <div className="mb-1 flex flex-wrap items-center justify-between gap-1">
-                <label className="text-xs font-semibold uppercase tracking-wide text-white/50">Zuständigkeit</label>
+                <label className="text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Zuständigkeit</label>
                 <button
                   type="button"
                   onClick={onOpenPeople}
@@ -152,11 +152,11 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
               <select
                 value={assigneeId ?? ''}
                 onChange={(e) => setAssigneeId(e.target.value || null)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
+                className="w-full rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
               >
-                <option value="" className="bg-surface-800">Nicht zugewiesen</option>
+                <option value="" className="bg-white">Nicht zugewiesen</option>
                 {people.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-surface-800">
+                  <option key={p.id} value={p.id} className="bg-white">
                     {p.name}
                   </option>
                 ))}
@@ -164,12 +164,12 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
             </div>
 
             <div className="min-w-0">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Kategorie</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Kategorie</label>
               <input
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="z. B. Projekt"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
+                className="w-full rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
               />
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {CATEGORIES.map((c) => (
@@ -189,34 +189,34 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Beginn</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Beginn</label>
               <input
                 type="date"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                className="w-full min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 [color-scheme:dark]"
+                className="w-full min-w-0 rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
               />
             </div>
             <div className="min-w-0">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Ende</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Ende</label>
               <input
                 type="date"
                 value={end}
                 min={start || undefined}
                 onChange={(e) => setEnd(e.target.value)}
-                className="w-full min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 [color-scheme:dark]"
+                className="w-full min-w-0 rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Hashtags</label>
-            <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-2 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/30">
-              <Hash size={14} className="ml-1 text-white/30" />
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Hashtags</label>
+            <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-2 py-2 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/30">
+              <Hash size={14} className="ml-1 text-[#151f76]/40" />
               {hashtags.map((tag) => (
                 <span key={tag} className="flex items-center gap-1 rounded-full bg-violet-500/25 px-2 py-0.5 text-xs text-violet-100">
                   #{tag}
-                  <button type="button" onClick={() => setHashtags(hashtags.filter((t) => t !== tag))} className="hover:text-white">
+                  <button type="button" onClick={() => setHashtags(hashtags.filter((t) => t !== tag))} className="hover:text-[#151f76]">
                     <X size={11} />
                   </button>
                 </span>
@@ -227,13 +227,13 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
                 onKeyDown={handleTagKeyDown}
                 onBlur={commitTag}
                 placeholder="tag + Enter"
-                className="min-w-[90px] flex-1 bg-transparent px-1 py-0.5 text-sm text-white placeholder-white/30 outline-none"
+                className="min-w-[90px] flex-1 bg-transparent px-1 py-0.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-white/50">Kartenfarbe</label>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Kartenfarbe</label>
             <div className="flex gap-2">
               {CARD_COLORS.map((c) => (
                 <button
@@ -253,7 +253,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white/70 hover:bg-white/10"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-[#151f76]/75 hover:bg-[#151f76]/6"
           >
             Abbrechen
           </button>

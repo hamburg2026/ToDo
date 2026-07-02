@@ -29,10 +29,10 @@ function BarRow({ icon, label, count, max, color }: BarRowProps) {
       {icon}
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <span className="truncate text-sm text-white/80">{label}</span>
-          <span className="text-sm font-semibold text-white/90">{count}</span>
+          <span className="truncate text-sm text-[#151f76]/85">{label}</span>
+          <span className="text-sm font-semibold text-[#151f76]">{count}</span>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#151f76]/6">
           <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
         </div>
       </div>
@@ -43,8 +43,8 @@ function BarRow({ icon, label, count, max, color }: BarRowProps) {
 function StatTile({ label, value, tone }: { label: string; value: number; tone?: 'danger' | 'default' }) {
   return (
     <div className="rounded-2xl glass p-4">
-      <p className={`text-3xl font-extrabold ${tone === 'danger' && value > 0 ? 'text-rose-400' : 'text-white'}`}>{value}</p>
-      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-white/50">{label}</p>
+      <p className={`text-3xl font-extrabold ${tone === 'danger' && value > 0 ? 'text-rose-500' : 'text-[#151f76]'}`}>{value}</p>
+      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-[#151f76]/55">{label}</p>
     </div>
   )
 }
@@ -96,7 +96,7 @@ export default function AnalyticsView({ onEdit }: Props) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-2xl glass p-5">
-          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-[#151f76]">
             <Users size={15} /> Aufgaben pro Person
           </h2>
           <div className="space-y-3">
@@ -121,7 +121,7 @@ export default function AnalyticsView({ onEdit }: Props) {
         </div>
 
         <div className="rounded-2xl glass p-5">
-          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-[#151f76]">
             <LayoutDashboard size={15} /> Aufgaben pro Board
           </h2>
           <div className="space-y-3">
@@ -130,7 +130,7 @@ export default function AnalyticsView({ onEdit }: Props) {
                 key={b.key}
                 icon={
                   b.key === 'pinboard' ? (
-                    <PinIcon size={14} className="shrink-0 text-white/40" />
+                    <PinIcon size={14} className="shrink-0 text-[#151f76]/50" />
                   ) : (
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: b.color }} />
                   )
@@ -147,7 +147,7 @@ export default function AnalyticsView({ onEdit }: Props) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-2xl glass p-5">
-          <h2 className="mb-4 text-sm font-bold text-white">Status-Verteilung</h2>
+          <h2 className="mb-4 text-sm font-bold text-[#151f76]">Status-Verteilung</h2>
           <div className="space-y-3">
             {columnCounts.map((c) => (
               <BarRow key={c.key} label={c.label} count={c.count} max={maxColumnCount} color={c.color} />
@@ -156,9 +156,9 @@ export default function AnalyticsView({ onEdit }: Props) {
         </div>
 
         <div className="rounded-2xl glass p-5">
-          <h2 className="mb-4 text-sm font-bold text-white">Kategorien</h2>
+          <h2 className="mb-4 text-sm font-bold text-[#151f76]">Kategorien</h2>
           <div className="space-y-3">
-            {categoryCounts.length === 0 && <p className="text-sm text-white/40">Noch keine Aufgaben.</p>}
+            {categoryCounts.length === 0 && <p className="text-sm text-[#151f76]/50">Noch keine Aufgaben.</p>}
             {categoryCounts.map((c) => (
               <BarRow key={c.key} label={c.label} count={c.count} max={maxCategoryCount} color={c.color} />
             ))}
@@ -167,11 +167,11 @@ export default function AnalyticsView({ onEdit }: Props) {
       </div>
 
       <div className="rounded-2xl glass p-5">
-        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-white">
-          <AlertTriangle size={15} className="text-rose-400" /> Überfällige Aufgaben
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-[#151f76]">
+          <AlertTriangle size={15} className="text-rose-500" /> Überfällige Aufgaben
         </h2>
         {overdue.length === 0 ? (
-          <p className="text-sm text-white/40">Keine überfälligen Aufgaben. 🎉</p>
+          <p className="text-sm text-[#151f76]/50">Keine überfälligen Aufgaben. 🎉</p>
         ) : (
           <div className="space-y-2">
             {overdue.map((task) => {
@@ -188,8 +188,8 @@ export default function AnalyticsView({ onEdit }: Props) {
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
                     style={{ backgroundColor: categoryColor(task.category) }}
                   />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-white/90">{task.title}</span>
-                  {board && <span className="shrink-0 text-xs text-white/40">{board.name}</span>}
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#151f76]">{task.title}</span>
+                  {board && <span className="shrink-0 text-xs text-[#151f76]/50">{board.name}</span>}
                   {assignee && (
                     <span
                       className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
@@ -198,7 +198,7 @@ export default function AnalyticsView({ onEdit }: Props) {
                       {assignee.initials}
                     </span>
                   )}
-                  <span className="shrink-0 rounded-full bg-rose-500/20 px-2 py-0.5 text-[11px] font-semibold text-rose-300">
+                  <span className="shrink-0 rounded-full bg-rose-500/20 px-2 py-0.5 text-[11px] font-semibold text-rose-600">
                     {formatDate(task.end)} · {daysLate} {daysLate === 1 ? 'Tag' : 'Tage'} überfällig
                   </span>
                 </button>
