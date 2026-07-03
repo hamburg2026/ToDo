@@ -18,7 +18,7 @@ function BoardTab({ board, active, onClick }: TabProps) {
       title={board.name}
       className={`pointer-events-auto flex items-center gap-2 rounded-l-2xl border py-3 pl-3 pr-2 shadow-card transition-all ${
         isOver
-          ? 'scale-110 border-[#151f76]/30 shadow-glow animate-pulse-edge'
+          ? 'border-[#151f76]/30 shadow-glow animate-pulse-edge'
           : active
             ? 'border-[#151f76]/15'
             : 'border-[#151f76]/10 hover:border-[#151f76]/15'
