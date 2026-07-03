@@ -39,6 +39,7 @@ interface StoreState {
   closeSettings: () => void
   openArchive: () => void
   closeArchive: () => void
+  archiveCompleted: () => void
   setActiveTaskId: (id: string | null) => void
 
   addTask: (draft: TaskDraft, position?: { x: number; y: number }) => Task
@@ -183,6 +184,12 @@ export const useStore = create<StoreState>()(
       closeSettings: () => set({ settingsOpen: false }),
       openArchive: () => set({ archiveOpen: true }),
       closeArchive: () => set({ archiveOpen: false }),
+      archiveCompleted: () =>
+        set({
+          tasks: get().tasks.map((t) =>
+            t.status === 'erledigt' && !t.archived ? { ...t, archived: true, updatedAt: now() } : t,
+          ),
+        }),
       setActiveTaskId: (id) => set({ activeTaskId: id }),
 
       addTask: (draft, position) => {
@@ -190,7 +197,7 @@ export const useStore = create<StoreState>()(
         const task: Task = {
           ...draft,
           id: nanoid(),
-          archived: draft.status === 'erledigt',
+          archived: false,
           page: 'pinboard',
           boardId: null,
           columnId: 'backlog',
@@ -208,11 +215,7 @@ export const useStore = create<StoreState>()(
 
       updateTask: (id, patch) =>
         set({
-          tasks: get().tasks.map((t) =>
-            t.id === id
-              ? { ...t, ...patch, archived: patch.status === 'erledigt' ? true : t.archived, updatedAt: now() }
-              : t,
-          ),
+          tasks: get().tasks.map((t) => (t.id === id ? { ...t, ...patch, updatedAt: now() } : t)),
         }),
 
       deleteTask: (id) => set({ tasks: get().tasks.filter((t) => t.id !== id) }),
