@@ -40,6 +40,8 @@ interface StoreState {
   openArchive: () => void
   closeArchive: () => void
   archiveCompleted: () => void
+  markArchiveSeen: (id: string) => void
+  markAllArchiveSeen: () => void
   setActiveTaskId: (id: string | null) => void
 
   addTask: (draft: TaskDraft, position?: { x: number; y: number }) => Task
@@ -109,6 +111,7 @@ function seedTasks(people: Person[]): Task[] {
       important: false,
       status: 'none',
       archived: false,
+      archiveUnseen: false,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -133,6 +136,7 @@ function seedTasks(people: Person[]): Task[] {
       important: true,
       status: 'in-arbeit',
       archived: false,
+      archiveUnseen: false,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -187,8 +191,18 @@ export const useStore = create<StoreState>()(
       archiveCompleted: () =>
         set({
           tasks: get().tasks.map((t) =>
-            t.status === 'erledigt' && !t.archived ? { ...t, archived: true, updatedAt: now() } : t,
+            t.status === 'erledigt' && !t.archived
+              ? { ...t, archived: true, archiveUnseen: true, updatedAt: now() }
+              : t,
           ),
+        }),
+      markArchiveSeen: (id) =>
+        set({
+          tasks: get().tasks.map((t) => (t.id === id ? { ...t, archiveUnseen: false } : t)),
+        }),
+      markAllArchiveSeen: () =>
+        set({
+          tasks: get().tasks.map((t) => (t.archived ? { ...t, archiveUnseen: false } : t)),
         }),
       setActiveTaskId: (id) => set({ activeTaskId: id }),
 
@@ -198,6 +212,7 @@ export const useStore = create<StoreState>()(
           ...draft,
           id: nanoid(),
           archived: false,
+          archiveUnseen: false,
           page: 'pinboard',
           boardId: null,
           columnId: 'backlog',
@@ -285,6 +300,7 @@ export const useStore = create<StoreState>()(
                   ...t,
                   status,
                   archived: false,
+                  archiveUnseen: false,
                   page: 'pinboard',
                   boardId: null,
                   columnId: 'backlog',
