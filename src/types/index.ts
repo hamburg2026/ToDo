@@ -46,6 +46,7 @@ export interface Task {
   important: boolean
   status: TaskStatus
   archived: boolean
+  archiveUnseen: boolean
   page: Page
   boardId: string | null
   columnId: ColumnId
@@ -60,5 +61,16 @@ export interface Task {
 
 export type TaskDraft = Omit<
   Task,
-  'id' | 'createdAt' | 'updatedAt' | 'x' | 'y' | 'rotation' | 'page' | 'boardId' | 'columnId' | 'order' | 'archived'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'x'
+  | 'y'
+  | 'rotation'
+  | 'page'
+  | 'boardId'
+  | 'columnId'
+  | 'order'
+  | 'archived'
+  | 'archiveUnseen'
 >

@@ -14,7 +14,9 @@ export default function Header() {
   const openSettings = useStore((s) => s.openSettings)
   const openArchive = useStore((s) => s.openArchive)
   const archiveCompleted = useStore((s) => s.archiveCompleted)
-  const pendingArchiveCount = useStore((s) => s.tasks.filter((t) => t.status === 'erledigt' && !t.archived).length)
+  const archiveBadgeCount = useStore(
+    (s) => s.tasks.filter((t) => (t.status === 'erledigt' && !t.archived) || (t.archived && t.archiveUnseen)).length,
+  )
   const activeBoard = boards.find((b) => b.id === activeBoardId)
 
   return (
@@ -114,9 +116,9 @@ export default function Header() {
           className="relative flex items-center justify-center rounded-full border border-[#151f76]/10 bg-white/60 p-2 text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Archive size={16} />
-          {pendingArchiveCount > 0 && (
+          {archiveBadgeCount > 0 && (
             <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
-              {pendingArchiveCount}
+              {archiveBadgeCount}
             </span>
           )}
         </button>

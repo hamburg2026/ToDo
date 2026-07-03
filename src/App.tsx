@@ -98,14 +98,15 @@ export default function App() {
     const task = tasks.find((t) => t.id === active.id)
     if (!task) return
 
-    // Drag onto a board tab (Lasche) on the right edge: move the task into that board
+    // Drag onto a board tab (Lasche) on the right edge: move the task into
+    // that Kanban board, but stay on the current page (e.g. the Pinnwand)
+    // instead of jumping to the board.
     if (typeof over?.id === 'string' && over.id.startsWith('board-tab-')) {
       const targetBoardId = over.id.slice('board-tab-'.length)
       if (task.page !== 'board' || task.boardId !== targetBoardId) {
         moveTaskToBoard(task.id, targetBoardId)
       }
       setActiveBoardId(targetBoardId)
-      setCurrentPage('board')
       return
     }
 
