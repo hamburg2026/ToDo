@@ -1,9 +1,11 @@
 import { useStore } from '../store/useStore'
 import { CARD_COLORS, randomPick } from '../lib/constants'
+import type { Page } from '../types'
 import HandwritingOverlay from './HandwritingOverlay'
 
 interface Props {
   onClose: () => void
+  page?: Page
 }
 
 function splitIntoTitleAndDescription(raw: string): { title: string; description: string } {
@@ -15,25 +17,29 @@ function splitIntoTitleAndDescription(raw: string): { title: string; description
   return { title: lines[0].slice(0, 120), description: lines.slice(1).join('\n') }
 }
 
-export default function HandwritingCapture({ onClose }: Props) {
+export default function HandwritingCapture({ onClose, page }: Props) {
   const addTask = useStore((s) => s.addTask)
 
   function handleSave(raw: string) {
     const { title, description } = splitIntoTitleAndDescription(raw)
     if (!title) return
-    addTask({
-      title,
-      description,
-      assigneeId: null,
-      start: null,
-      end: null,
-      category: '',
-      hashtags: [],
-      today: false,
-      important: false,
-      status: 'none',
-      color: randomPick(CARD_COLORS),
-    })
+    addTask(
+      {
+        title,
+        description,
+        assigneeId: null,
+        start: null,
+        end: null,
+        category: '',
+        hashtags: [],
+        today: false,
+        important: false,
+        status: 'none',
+        color: randomPick(CARD_COLORS),
+      },
+      undefined,
+      page,
+    )
     onClose()
   }
 
