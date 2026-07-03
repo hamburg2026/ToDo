@@ -2,17 +2,18 @@ import { useEffect, useState } from 'react'
 import { X, Users, Hash, PenLine, CalendarDays, Star } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { CARD_COLORS, CATEGORIES, STATUS_OPTIONS, categoryColor } from '../lib/constants'
-import type { Task, TaskStatus } from '../types'
+import type { Page, Task, TaskStatus } from '../types'
 import HandwritingOverlay from './HandwritingOverlay'
 
 interface Props {
   taskId: string | null
   initialPosition?: { x: number; y: number }
+  targetPage?: Page
   onClose: () => void
   onOpenPeople: () => void
 }
 
-export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeople }: Props) {
+export default function TaskModal({ taskId, initialPosition, targetPage, onClose, onOpenPeople }: Props) {
   const task = useStore((s) => s.tasks.find((t) => t.id === taskId))
   const people = useStore((s) => s.people)
   const addTask = useStore((s) => s.addTask)
@@ -97,7 +98,7 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
     if (task) {
       updateTask(task.id, payload as Partial<Task>)
     } else {
-      addTask(payload, initialPosition)
+      addTask(payload, initialPosition, targetPage)
     }
     onClose()
   }
@@ -201,7 +202,18 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Beginn</label>
+              <div className="mb-1 flex items-center justify-between gap-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Beginn</label>
+                {start && (
+                  <button
+                    type="button"
+                    onClick={() => setStart('')}
+                    className="flex items-center gap-0.5 text-[11px] font-medium text-violet-300 hover:text-violet-200"
+                  >
+                    <X size={11} /> Zurücksetzen
+                  </button>
+                )}
+              </div>
               <input
                 type="date"
                 value={start}
@@ -210,7 +222,18 @@ export default function TaskModal({ taskId, initialPosition, onClose, onOpenPeop
               />
             </div>
             <div className="min-w-0">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Ende</label>
+              <div className="mb-1 flex items-center justify-between gap-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Ende</label>
+                {end && (
+                  <button
+                    type="button"
+                    onClick={() => setEnd('')}
+                    className="flex items-center gap-0.5 text-[11px] font-medium text-violet-300 hover:text-violet-200"
+                  >
+                    <X size={11} /> Zurücksetzen
+                  </button>
+                )}
+              </div>
               <input
                 type="date"
                 value={end}

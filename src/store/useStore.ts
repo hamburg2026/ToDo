@@ -44,7 +44,7 @@ interface StoreState {
   markAllArchiveSeen: () => void
   setActiveTaskId: (id: string | null) => void
 
-  addTask: (draft: TaskDraft, position?: { x: number; y: number }) => Task
+  addTask: (draft: TaskDraft, position?: { x: number; y: number }, page?: Page) => Task
   updateTask: (id: string, patch: Partial<Task>) => void
   deleteTask: (id: string) => void
   moveTaskToColumn: (id: string, boardId: string, columnId: ColumnId, targetIndex?: number) => void
@@ -206,17 +206,17 @@ export const useStore = create<StoreState>()(
         }),
       setActiveTaskId: (id) => set({ activeTaskId: id }),
 
-      addTask: (draft, position) => {
+      addTask: (draft, position, page = 'pinboard') => {
         const t = now()
         const task: Task = {
           ...draft,
           id: nanoid(),
           archived: false,
           archiveUnseen: false,
-          page: 'pinboard',
+          page,
           boardId: null,
           columnId: 'backlog',
-          order: get().tasks.filter((x) => x.columnId === 'backlog' && x.page === 'pinboard').length,
+          order: get().tasks.filter((x) => x.columnId === 'backlog' && x.page === page).length,
           x: position?.x ?? 80 + Math.random() * 160,
           y: position?.y ?? 80 + Math.random() * 160,
           rotation: Math.random() * 6 - 3,

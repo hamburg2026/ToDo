@@ -69,6 +69,7 @@ export default function App() {
   const [modalTaskId, setModalTaskId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | undefined>(undefined)
+  const [modalTargetPage, setModalTargetPage] = useState<Page>('pinboard')
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const sensors = useSensors(
@@ -77,9 +78,10 @@ export default function App() {
 
   const activeTask = useMemo(() => tasks.find((t) => t.id === activeId) ?? null, [tasks, activeId])
 
-  function openCreateModal(position?: { x: number; y: number }) {
+  function openCreateModal(position?: { x: number; y: number }, targetPage: Page = 'pinboard') {
     setModalTaskId(null)
     setModalPosition(position)
+    setModalTargetPage(targetPage)
     setModalOpen(true)
   }
 
@@ -183,7 +185,9 @@ export default function App() {
           <Header />
           <main className="relative z-0 flex-1 overflow-hidden">
             {currentPage === 'pinboard' && <Pinboard onCreate={openCreateModal} onEdit={openEditModal} />}
-            {currentPage === 'today' && <TodayBoard onEdit={openEditModal} />}
+            {currentPage === 'today' && (
+              <TodayBoard onCreate={(position) => openCreateModal(position, 'today')} onEdit={openEditModal} />
+            )}
             {currentPage === 'board' && boardView === 'kanban' && <KanbanBoard onEdit={openEditModal} />}
             {currentPage === 'board' && boardView === 'plan' && <PlanView onEdit={openEditModal} />}
             {currentPage === 'analytics' && <AnalyticsView onEdit={openEditModal} />}
@@ -218,6 +222,7 @@ export default function App() {
         <TaskModal
           taskId={modalTaskId}
           initialPosition={modalPosition}
+          targetPage={modalTargetPage}
           onClose={() => setModalOpen(false)}
           onOpenPeople={() => useStore.getState().openPeopleManager()}
         />
