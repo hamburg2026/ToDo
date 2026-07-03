@@ -13,7 +13,8 @@ export default function Header() {
   const openBoardsManager = useStore((s) => s.openBoardsManager)
   const openSettings = useStore((s) => s.openSettings)
   const openArchive = useStore((s) => s.openArchive)
-  const archivedCount = useStore((s) => s.tasks.filter((t) => t.archived).length)
+  const archiveCompleted = useStore((s) => s.archiveCompleted)
+  const pendingArchiveCount = useStore((s) => s.tasks.filter((t) => t.status === 'erledigt' && !t.archived).length)
   const activeBoard = boards.find((b) => b.id === activeBoardId)
 
   return (
@@ -104,15 +105,18 @@ export default function Header() {
         </button>
 
         <button
-          onClick={openArchive}
+          onClick={() => {
+            archiveCompleted()
+            openArchive()
+          }}
           aria-label="Archiv"
-          title="Archiv"
+          title="Erledigte archivieren"
           className="relative flex items-center justify-center rounded-full border border-[#151f76]/10 bg-white/60 p-2 text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Archive size={16} />
-          {archivedCount > 0 && (
+          {pendingArchiveCount > 0 && (
             <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
-              {archivedCount}
+              {pendingArchiveCount}
             </span>
           )}
         </button>

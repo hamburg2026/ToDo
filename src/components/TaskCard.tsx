@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarDays, CalendarRange, ChevronDown, ChevronUp, Pencil, Star, Trash2 } from 'lucide-react'
+import { CalendarDays, CalendarRange, ChevronDown, ChevronUp, Star, Trash2 } from 'lucide-react'
 import type { Task } from '../types'
 import { useStore } from '../store/useStore'
 import { categoryColor, statusOption, CARD_FONT_CLASSES, CARD_FONT_SIZE_CLASSES } from '../lib/constants'
@@ -26,6 +26,10 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
   return (
     <div
       {...dragHandleProps}
+      onDoubleClick={(e) => {
+        e.stopPropagation()
+        onEdit?.()
+      }}
       className={`group relative w-64 select-none rounded-xl p-3.5 text-slate-900 shadow-card transition-shadow ${
         dragging ? 'shadow-glow ring-2 ring-white/60 scale-[1.03]' : 'hover:shadow-glow'
       } ${compact ? 'w-full' : ''}`}
@@ -58,18 +62,9 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onEdit?.()
-            }}
-            className="rounded-md bg-white/50 p-1 hover:bg-white/80"
-            aria-label="Bearbeiten"
-          >
-            <Pencil size={13} />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
               deleteTask(task.id)
             }}
+            onDoubleClick={(e) => e.stopPropagation()}
             className="rounded-md bg-white/50 p-1 hover:bg-red-200"
             aria-label="Löschen"
           >
@@ -86,6 +81,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
               e.stopPropagation()
               setDescOpen((v) => !v)
             }}
+            onDoubleClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1 text-slate-700/70 hover:text-slate-900"
           >
             {descOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
