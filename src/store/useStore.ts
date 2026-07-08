@@ -112,6 +112,7 @@ function seedTasks(people: Person[]): Task[] {
       status: 'none',
       archived: false,
       archiveUnseen: false,
+      archivedAt: null,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -137,6 +138,7 @@ function seedTasks(people: Person[]): Task[] {
       status: 'in-arbeit',
       archived: false,
       archiveUnseen: false,
+      archivedAt: null,
       page: 'pinboard',
       boardId: null,
       columnId: 'backlog',
@@ -192,7 +194,7 @@ export const useStore = create<StoreState>()(
         set({
           tasks: get().tasks.map((t) =>
             t.status === 'erledigt' && !t.archived
-              ? { ...t, archived: true, archiveUnseen: true, updatedAt: now() }
+              ? { ...t, archived: true, archiveUnseen: true, archivedAt: now(), updatedAt: now() }
               : t,
           ),
         }),
@@ -213,6 +215,7 @@ export const useStore = create<StoreState>()(
           id: nanoid(),
           archived: false,
           archiveUnseen: false,
+          archivedAt: null,
           page,
           boardId: null,
           columnId: 'backlog',
@@ -301,6 +304,7 @@ export const useStore = create<StoreState>()(
                   status,
                   archived: false,
                   archiveUnseen: false,
+                  archivedAt: null,
                   page: 'pinboard',
                   boardId: null,
                   columnId: 'backlog',

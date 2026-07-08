@@ -31,3 +31,15 @@ export function daysUntil(iso: string): number {
   const target = startOfDay(parseLocalDate(iso)).getTime()
   return Math.round((target - today) / (24 * 60 * 60 * 1000))
 }
+
+// Format a Date.now()-style timestamp as a German date + time string.
+export function formatDateTime(ts: number | null): string {
+  if (!ts) return ''
+  return new Date(ts).toLocaleString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
