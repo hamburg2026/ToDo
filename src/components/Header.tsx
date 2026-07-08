@@ -20,18 +20,18 @@ export default function Header() {
   const activeBoard = boards.find((b) => b.id === activeBoardId)
 
   return (
-    <header className="relative z-50 flex items-center justify-between px-6 py-4">
-      <div className="flex items-center gap-2.5">
-        <img src={`${import.meta.env.BASE_URL}brand/ponturo-icon.svg`} alt="" className="h-9 w-9" />
-        <span className="text-lg tracking-tight text-[#151f76]">
+    <header className="relative z-50 grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 px-6 py-4">
+      <div className="flex min-w-0 items-center gap-2.5 justify-self-start">
+        <img src={`${import.meta.env.BASE_URL}brand/ponturo-icon.svg`} alt="" className="h-9 w-9 shrink-0" />
+        <span className="whitespace-nowrap text-lg tracking-tight text-[#151f76]">
           ponturo <span className="font-medium text-[#151f76]/60">Taskwall</span>
         </span>
       </div>
 
-      <div className="flex items-center gap-2 rounded-full glass p-1">
+      <div className="flex flex-wrap items-center justify-center gap-2 rounded-full glass p-1">
         <button
           onClick={() => setCurrentPage('pinboard')}
-          className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+          className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
             currentPage === 'pinboard' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
@@ -39,7 +39,7 @@ export default function Header() {
         </button>
         <button
           onClick={() => setCurrentPage('today')}
-          className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+          className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
             currentPage === 'today' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
@@ -47,7 +47,7 @@ export default function Header() {
         </button>
         <button
           onClick={() => setCurrentPage('board')}
-          className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+          className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
             currentPage === 'board' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
@@ -55,7 +55,7 @@ export default function Header() {
         </button>
         <button
           onClick={() => setCurrentPage('analytics')}
-          className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+          className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
             currentPage === 'analytics' ? 'accent-gradient text-white shadow-glow' : 'text-[#151f76]/60 hover:text-[#151f76]'
           }`}
         >
@@ -63,9 +63,9 @@ export default function Header() {
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 justify-self-end">
         {currentPage === 'board' && activeBoard && (
-          <div className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#151f76]/75">
+          <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#151f76]/75">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: activeBoard.color }} />
             {activeBoard.name}
           </div>
@@ -75,7 +75,7 @@ export default function Header() {
           <div className="flex items-center gap-1 rounded-full glass p-1">
             <button
               onClick={() => setBoardView('kanban')}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                 boardView === 'kanban' ? 'bg-[#151f76]/10 text-[#151f76]' : 'text-[#151f76]/55 hover:text-[#151f76]'
               }`}
             >
@@ -83,7 +83,7 @@ export default function Header() {
             </button>
             <button
               onClick={() => setBoardView('plan')}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                 boardView === 'plan' ? 'bg-[#151f76]/10 text-[#151f76]' : 'text-[#151f76]/55 hover:text-[#151f76]'
               }`}
             >
@@ -94,14 +94,14 @@ export default function Header() {
 
         <button
           onClick={openPeopleManager}
-          className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
+          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Users size={14} /> Personen
         </button>
 
         <button
           onClick={openBoardsManager}
-          className="flex items-center gap-1.5 rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
+          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Layers size={14} /> Boards
         </button>
