@@ -1,6 +1,7 @@
 import { CheckCheck, X } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { STATUS_OPTIONS, categoryColor } from '../lib/constants'
+import { formatDateTime } from '../lib/date'
 
 interface Props {
   onClose: () => void
@@ -44,7 +45,7 @@ export default function ArchiveManager({ onClose }: Props) {
           <div className="space-y-3">
             {tasks
               .slice()
-              .sort((a, b) => b.updatedAt - a.updatedAt)
+              .sort((a, b) => (b.archivedAt ?? b.updatedAt) - (a.archivedAt ?? a.updatedAt))
               .map((task) => (
                 <div
                   key={task.id}
@@ -71,6 +72,10 @@ export default function ArchiveManager({ onClose }: Props) {
                       {task.category || 'Ohne Kategorie'}
                     </span>
                   </div>
+
+                  <p className="mb-2 text-[11px] text-[#151f76]/45">
+                    Archiviert am {formatDateTime(task.archivedAt)}
+                  </p>
 
                   <p className="mb-1.5 text-[11px] text-[#151f76]/55">
                     Status ändern, um die Aufgabe zurück auf die Pinnwand zu holen:

@@ -108,16 +108,16 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
-        className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
+        className="flex max-h-[88vh] w-full max-w-lg flex-col rounded-2xl glass shadow-glow animate-pop-in"
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-6">
           <h2 className="text-lg font-bold text-[#151f76]">{task ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2>
           <button type="button" onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
             <X size={18} />
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 pb-4">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Titel</label>
             <input
@@ -346,7 +346,7 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="flex shrink-0 justify-end gap-2 border-t border-[#151f76]/10 px-6 py-4">
           <button
             type="button"
             onClick={onClose}

@@ -47,6 +47,7 @@ export interface Task {
   status: TaskStatus
   archived: boolean
   archiveUnseen: boolean
+  archivedAt: number | null
   page: Page
   boardId: string | null
   columnId: ColumnId
@@ -73,4 +74,5 @@ export type TaskDraft = Omit<
   | 'order'
   | 'archived'
   | 'archiveUnseen'
+  | 'archivedAt'
 >
