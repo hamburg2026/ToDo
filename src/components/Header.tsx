@@ -1,23 +1,18 @@
-import { PinIcon, Users, KanbanSquare, CalendarClock, CalendarCheck2, Settings, Layers, Archive, BarChart3 } from 'lucide-react'
+import { PinIcon, Users, KanbanSquare, CalendarCheck2, Settings, Archive, BarChart3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
+import BoardsMenu from './BoardsMenu'
 
 export default function Header() {
   const currentPage = useStore((s) => s.currentPage)
   const setCurrentPage = useStore((s) => s.setCurrentPage)
-  const boardView = useStore((s) => s.boardView)
-  const setBoardView = useStore((s) => s.setBoardView)
-  const boards = useStore((s) => s.boards)
-  const activeBoardId = useStore((s) => s.activeBoardId)
   const openPeopleManager = useStore((s) => s.openPeopleManager)
-  const openBoardsManager = useStore((s) => s.openBoardsManager)
   const openSettings = useStore((s) => s.openSettings)
   const openArchive = useStore((s) => s.openArchive)
   const archiveCompleted = useStore((s) => s.archiveCompleted)
   const archiveBadgeCount = useStore(
     (s) => s.tasks.filter((t) => (t.status === 'erledigt' && !t.archived) || (t.archived && t.archiveUnseen)).length,
   )
-  const activeBoard = boards.find((b) => b.id === activeBoardId)
 
   return (
     <header className="relative z-50 grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 px-6 py-4">
@@ -64,34 +59,6 @@ export default function Header() {
       </div>
 
       <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 justify-self-end">
-        {currentPage === 'board' && activeBoard && (
-          <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#151f76]/75">
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: activeBoard.color }} />
-            {activeBoard.name}
-          </div>
-        )}
-
-        {currentPage === 'board' && (
-          <div className="flex items-center gap-1 rounded-full glass p-1">
-            <button
-              onClick={() => setBoardView('kanban')}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
-                boardView === 'kanban' ? 'bg-[#151f76]/10 text-[#151f76]' : 'text-[#151f76]/55 hover:text-[#151f76]'
-              }`}
-            >
-              <KanbanSquare size={13} /> Kanban
-            </button>
-            <button
-              onClick={() => setBoardView('plan')}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
-                boardView === 'plan' ? 'bg-[#151f76]/10 text-[#151f76]' : 'text-[#151f76]/55 hover:text-[#151f76]'
-              }`}
-            >
-              <CalendarClock size={13} /> Plan
-            </button>
-          </div>
-        )}
-
         <button
           onClick={openPeopleManager}
           className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
@@ -99,12 +66,7 @@ export default function Header() {
           <Users size={14} /> Personen
         </button>
 
-        <button
-          onClick={openBoardsManager}
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
-        >
-          <Layers size={14} /> Boards
-        </button>
+        <BoardsMenu />
 
         <button
           onClick={() => {
