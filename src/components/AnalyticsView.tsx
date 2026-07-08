@@ -1,4 +1,5 @@
-import { AlertTriangle, CalendarCheck2, LayoutDashboard, PinIcon, Users } from 'lucide-react'
+import { AlertTriangle, CalendarCheck2, Hash, LayoutDashboard, PinIcon, Users, X } from 'lucide-react'
+import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import { COLUMNS, categoryColor } from '../lib/constants'
 import { formatDate, daysUntil } from '../lib/date'
@@ -20,12 +21,18 @@ interface BarRowProps {
   count: number
   max: number
   color: string
+  onClick?: () => void
 }
 
-function BarRow({ icon, label, count, max, color }: BarRowProps) {
+function BarRow({ icon, label, count, max, color, onClick }: BarRowProps) {
   const pct = max > 0 ? Math.max(4, Math.round((count / max) * 100)) : 0
   return (
-    <div className="flex items-center gap-3">
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!onClick || count === 0}
+      className="flex w-full items-center gap-3 rounded-lg py-0.5 text-left transition-colors enabled:hover:bg-[#151f76]/5 disabled:cursor-default"
+    >
       {icon}
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center justify-between gap-2">
@@ -35,6 +42,77 @@ function BarRow({ icon, label, count, max, color }: BarRowProps) {
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#151f76]/6">
           <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
         </div>
+      </div>
+    </button>
+  )
+}
+
+interface TaskDetail {
+  title: string
+  tasks: Task[]
+}
+
+function TaskDetailModal({
+  detail,
+  onEdit,
+  onClose,
+}: {
+  detail: TaskDetail
+  onEdit: (id: string) => void
+  onClose: () => void
+}) {
+  const people = useStore((s) => s.people)
+  const boards = useStore((s) => s.boards)
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
+      >
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <h2 className="text-lg font-bold text-[#151f76]">{detail.title}</h2>
+          <button onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
+            <X size={18} />
+          </button>
+        </div>
+
+        {detail.tasks.length === 0 ? (
+          <p className="py-8 text-center text-sm text-[#151f76]/45">Keine Aufgaben gefunden.</p>
+        ) : (
+          <div className="space-y-2">
+            {detail.tasks.map((task) => {
+              const assignee = people.find((p) => p.id === task.assigneeId)
+              const board = boards.find((b) => b.id === task.boardId)
+              return (
+                <button
+                  key={task.id}
+                  onClick={() => {
+                    onEdit(task.id)
+                    onClose()
+                  }}
+                  className="flex w-full items-center gap-3 rounded-xl border border-[#151f76]/10 bg-[#151f76]/4 px-4 py-3 text-left transition-colors hover:bg-[#151f76]/8"
+                >
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: categoryColor(task.category) }}
+                  />
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#151f76]">{task.title}</span>
+                  {board && <span className="shrink-0 text-xs text-[#151f76]/50">{board.name}</span>}
+                  {task.end && <span className="shrink-0 text-xs text-[#151f76]/50">{formatDate(task.end)}</span>}
+                  {assignee && (
+                    <span
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                      style={{ backgroundColor: assignee.color }}
+                    >
+                      {assignee.initials}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -55,37 +133,56 @@ export default function AnalyticsView({ onEdit }: Props) {
   const archivedCount = allTasks.filter((t) => t.archived).length
   const people = useStore((s) => s.people)
   const boards = useStore((s) => s.boards)
+  const [detail, setDetail] = useState<TaskDetail | null>(null)
 
   const doneCount = tasks.filter((t) => t.page === 'board' && t.columnId === 'done').length
   const overdue = tasks.filter(isOverdue).sort((a, b) => daysUntil(a.end as string) - daysUntil(b.end as string))
 
   const personCounts = [
-    ...people.map((p) => ({ key: p.id, label: p.name, color: p.color, count: tasks.filter((t) => t.assigneeId === p.id).length })),
-    { key: 'none', label: 'Nicht zugewiesen', color: '#64748b', count: tasks.filter((t) => !t.assigneeId).length },
-  ].sort((a, b) => b.count - a.count)
-  const maxPersonCount = Math.max(1, ...personCounts.map((p) => p.count))
+    ...people.map((p) => ({ key: p.id, label: p.name, color: p.color, matching: tasks.filter((t) => t.assigneeId === p.id) })),
+    { key: 'none', label: 'Nicht zugewiesen', color: '#64748b', matching: tasks.filter((t) => !t.assigneeId) },
+  ].sort((a, b) => b.matching.length - a.matching.length)
+  const maxPersonCount = Math.max(1, ...personCounts.map((p) => p.matching.length))
 
   const boardCounts = [
-    { key: 'pinboard', label: 'Pinnwand', color: '#94a3b8', count: tasks.filter((t) => t.page === 'pinboard').length },
-    { key: 'today', label: 'Heute zu tun', color: '#0073d2', count: tasks.filter((t) => t.page === 'today').length },
-    ...boards.map((b) => ({ key: b.id, label: b.name, color: b.color, count: tasks.filter((t) => t.page === 'board' && t.boardId === b.id).length })),
-  ].sort((a, b) => b.count - a.count)
-  const maxBoardCount = Math.max(1, ...boardCounts.map((b) => b.count))
+    { key: 'pinboard', label: 'Pinnwand', color: '#94a3b8', matching: tasks.filter((t) => t.page === 'pinboard') },
+    { key: 'today', label: 'Heute zu tun', color: '#0073d2', matching: tasks.filter((t) => t.page === 'today') },
+    ...boards.map((b) => ({ key: b.id, label: b.name, color: b.color, matching: tasks.filter((t) => t.page === 'board' && t.boardId === b.id) })),
+  ].sort((a, b) => b.matching.length - a.matching.length)
+  const maxBoardCount = Math.max(1, ...boardCounts.map((b) => b.matching.length))
 
-  const columnCounts = COLUMNS.map((c) => ({ key: c.id, label: c.title, color: c.accent, count: tasks.filter((t) => t.page === 'board' && t.columnId === c.id).length }))
-  const maxColumnCount = Math.max(1, ...columnCounts.map((c) => c.count))
+  const columnCounts = COLUMNS.map((c) => ({
+    key: c.id,
+    label: c.title,
+    color: c.accent,
+    matching: tasks.filter((t) => t.page === 'board' && t.columnId === c.id),
+  }))
+  const maxColumnCount = Math.max(1, ...columnCounts.map((c) => c.matching.length))
 
   const categoryCounts = (() => {
-    const map = new Map<string, number>()
+    const map = new Map<string, Task[]>()
     tasks.forEach((t) => {
       const key = t.category?.trim() || 'Ohne Kategorie'
-      map.set(key, (map.get(key) ?? 0) + 1)
+      map.set(key, [...(map.get(key) ?? []), t])
     })
     return Array.from(map.entries())
-      .map(([label, count]) => ({ key: label, label, count, color: categoryColor(label) }))
-      .sort((a, b) => b.count - a.count)
+      .map(([label, matching]) => ({ key: label, label, matching, color: categoryColor(label) }))
+      .sort((a, b) => b.matching.length - a.matching.length)
   })()
-  const maxCategoryCount = Math.max(1, ...categoryCounts.map((c) => c.count))
+  const maxCategoryCount = Math.max(1, ...categoryCounts.map((c) => c.matching.length))
+
+  const hashtagCounts = (() => {
+    const map = new Map<string, Task[]>()
+    tasks.forEach((t) => {
+      t.hashtags.forEach((tag) => {
+        map.set(tag, [...(map.get(tag) ?? []), t])
+      })
+    })
+    return Array.from(map.entries())
+      .map(([label, matching]) => ({ key: label, label: `#${label}`, matching, color: '#0073d2' }))
+      .sort((a, b) => b.matching.length - a.matching.length)
+  })()
+  const maxHashtagCount = Math.max(1, ...hashtagCounts.map((h) => h.matching.length))
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto pl-6 pr-24 py-6">
@@ -116,9 +213,10 @@ export default function AnalyticsView({ onEdit }: Props) {
                   </span>
                 }
                 label={p.label}
-                count={p.count}
+                count={p.matching.length}
                 max={maxPersonCount}
                 color={p.color}
+                onClick={() => setDetail({ title: `Aufgaben von ${p.label}`, tasks: p.matching })}
               />
             ))}
           </div>
@@ -142,9 +240,10 @@ export default function AnalyticsView({ onEdit }: Props) {
                   )
                 }
                 label={b.label}
-                count={b.count}
+                count={b.matching.length}
                 max={maxBoardCount}
                 color={b.color}
+                onClick={() => setDetail({ title: `Aufgaben: ${b.label}`, tasks: b.matching })}
               />
             ))}
           </div>
@@ -156,7 +255,14 @@ export default function AnalyticsView({ onEdit }: Props) {
           <h2 className="mb-4 text-sm font-bold text-[#151f76]">Status-Verteilung</h2>
           <div className="space-y-3">
             {columnCounts.map((c) => (
-              <BarRow key={c.key} label={c.label} count={c.count} max={maxColumnCount} color={c.color} />
+              <BarRow
+                key={c.key}
+                label={c.label}
+                count={c.matching.length}
+                max={maxColumnCount}
+                color={c.color}
+                onClick={() => setDetail({ title: `Status: ${c.label}`, tasks: c.matching })}
+              />
             ))}
           </div>
         </div>
@@ -166,9 +272,35 @@ export default function AnalyticsView({ onEdit }: Props) {
           <div className="space-y-3">
             {categoryCounts.length === 0 && <p className="text-sm text-[#151f76]/50">Noch keine Aufgaben.</p>}
             {categoryCounts.map((c) => (
-              <BarRow key={c.key} label={c.label} count={c.count} max={maxCategoryCount} color={c.color} />
+              <BarRow
+                key={c.key}
+                label={c.label}
+                count={c.matching.length}
+                max={maxCategoryCount}
+                color={c.color}
+                onClick={() => setDetail({ title: `Kategorie: ${c.label}`, tasks: c.matching })}
+              />
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl glass p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-[#151f76]">
+          <Hash size={15} /> Aufgaben pro Hashtag
+        </h2>
+        <div className="space-y-3">
+          {hashtagCounts.length === 0 && <p className="text-sm text-[#151f76]/50">Noch keine Hashtags vergeben.</p>}
+          {hashtagCounts.map((h) => (
+            <BarRow
+              key={h.key}
+              label={h.label}
+              count={h.matching.length}
+              max={maxHashtagCount}
+              color={h.color}
+              onClick={() => setDetail({ title: h.label, tasks: h.matching })}
+            />
+          ))}
         </div>
       </div>
 
@@ -213,6 +345,8 @@ export default function AnalyticsView({ onEdit }: Props) {
           </div>
         )}
       </div>
+
+      {detail && <TaskDetailModal detail={detail} onEdit={onEdit} onClose={() => setDetail(null)} />}
     </div>
   )
 }
