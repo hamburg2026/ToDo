@@ -20,6 +20,7 @@ export default function PlanView({ onEdit }: Props) {
   const activeBoardId = useStore((s) => s.activeBoardId)
   const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId && !t.archived)
   const people = useStore((s) => s.people)
+  const categories = useStore((s) => s.categories)
 
   // A task only needs a Zieldatum (end date) to appear in the plan; the start
   // date is optional and, when missing, the task is shown as a single-day
@@ -84,7 +85,7 @@ export default function PlanView({ onEdit }: Props) {
                 <div className="flex w-[220px] shrink-0 items-center gap-2 border-r border-[#151f76]/10 px-4 py-3">
                   <span
                     className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: categoryColor(task.category) }}
+                    style={{ backgroundColor: categoryColor(task.category, categories) }}
                   />
                   <span className="truncate text-sm text-[#151f76]/90">{task.title}</span>
                 </div>

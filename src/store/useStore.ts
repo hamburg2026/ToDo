@@ -1,13 +1,14 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { AppView, Board, BoardView, CardFont, CardFontSize, ColumnId, Page, Person, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
-import { BOARD_COLORS, CARD_COLORS, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
+import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, Page, Person, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
+import { BOARD_COLORS, CARD_COLORS, CATEGORY_COLOR_PALETTE, DEFAULT_CATEGORIES, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
 
 interface StoreState {
   tasks: Task[]
   people: Person[]
   boards: Board[]
+  categories: Category[]
   activeBoardId: string
   currentPage: AppView
   boardView: BoardView
@@ -19,6 +20,7 @@ interface StoreState {
   kanbanZoom: number
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
+  categoriesManagerOpen: boolean
   settingsOpen: boolean
   archiveOpen: boolean
   activeTaskId: string | null
@@ -35,6 +37,8 @@ interface StoreState {
   closePeopleManager: () => void
   openBoardsManager: () => void
   closeBoardsManager: () => void
+  openCategoriesManager: () => void
+  closeCategoriesManager: () => void
   openSettings: () => void
   closeSettings: () => void
   openArchive: () => void
@@ -64,6 +68,10 @@ interface StoreState {
   updateBoard: (id: string, patch: Partial<Board>) => void
   deleteBoard: (id: string) => void
 
+  addCategory: (name: string, color?: string) => Category
+  updateCategory: (id: string, patch: Partial<Category>) => void
+  deleteCategory: (id: string) => void
+
   exportData: () => string
   importData: (json: string) => { ok: true } | { ok: false; error: string }
   resetData: () => void
@@ -77,6 +85,7 @@ interface BackupPayload {
   tasks: Task[]
   people: Person[]
   boards: Board[]
+  categories: Category[]
   activeBoardId: string
   cardFont: CardFont
   cardFontSize: CardFontSize
@@ -92,6 +101,8 @@ const seedBoards: Board[] = [
   { id: nanoid(), name: 'Arbeit', color: BOARD_COLORS[0] },
   { id: nanoid(), name: 'Privat', color: BOARD_COLORS[1] },
 ]
+
+const seedCategories: Category[] = DEFAULT_CATEGORIES.map((c) => ({ ...c, id: nanoid() }))
 
 const now = () => Date.now()
 
@@ -166,6 +177,7 @@ export const useStore = create<StoreState>()(
       tasks: seedTasks(seedPeople),
       people: seedPeople,
       boards: seedBoards,
+      categories: seedCategories,
       activeBoardId: seedBoards[0].id,
       currentPage: 'pinboard',
       boardView: 'kanban',
@@ -177,6 +189,7 @@ export const useStore = create<StoreState>()(
       kanbanZoom: 1,
       peopleManagerOpen: false,
       boardsManagerOpen: false,
+      categoriesManagerOpen: false,
       settingsOpen: false,
       archiveOpen: false,
       activeTaskId: null,
@@ -193,6 +206,8 @@ export const useStore = create<StoreState>()(
       closePeopleManager: () => set({ peopleManagerOpen: false }),
       openBoardsManager: () => set({ boardsManagerOpen: true }),
       closeBoardsManager: () => set({ boardsManagerOpen: false }),
+      openCategoriesManager: () => set({ categoriesManagerOpen: true }),
+      closeCategoriesManager: () => set({ categoriesManagerOpen: false }),
       openSettings: () => set({ settingsOpen: true }),
       closeSettings: () => set({ settingsOpen: false }),
       openArchive: () => set({ archiveOpen: true }),
@@ -396,6 +411,25 @@ export const useStore = create<StoreState>()(
         })
       },
 
+      addCategory: (name, color) => {
+        const category: Category = { id: nanoid(), name, color: color || randomPick(CATEGORY_COLOR_PALETTE) }
+        set({ categories: [...get().categories, category] })
+        return category
+      },
+
+      updateCategory: (id, patch) => {
+        const previous = get().categories.find((c) => c.id === id)
+        set({
+          categories: get().categories.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+          tasks:
+            previous && patch.name && patch.name !== previous.name
+              ? get().tasks.map((t) => (t.category === previous.name ? { ...t, category: patch.name as string, updatedAt: now() } : t))
+              : get().tasks,
+        })
+      },
+
+      deleteCategory: (id) => set({ categories: get().categories.filter((c) => c.id !== id) }),
+
       exportData: () => {
         const payload: BackupPayload = {
           version: BACKUP_VERSION,
@@ -403,6 +437,7 @@ export const useStore = create<StoreState>()(
           tasks: get().tasks,
           people: get().people,
           boards: get().boards,
+          categories: get().categories,
           activeBoardId: get().activeBoardId,
           cardFont: get().cardFont,
           cardFontSize: get().cardFontSize,
@@ -452,6 +487,7 @@ export const useStore = create<StoreState>()(
           tasks,
           people: payload.people,
           boards,
+          categories: Array.isArray(payload.categories) && payload.categories.length > 0 ? payload.categories : get().categories,
           activeBoardId,
           cardFont: payload.cardFont ?? get().cardFont,
           cardFontSize: payload.cardFontSize ?? get().cardFontSize,
@@ -465,10 +501,12 @@ export const useStore = create<StoreState>()(
       resetData: () => {
         const people = seedPeople.map((p) => ({ ...p, id: nanoid() }))
         const boards = seedBoards.map((b) => ({ ...b, id: nanoid() }))
+        const categories = DEFAULT_CATEGORIES.map((c) => ({ ...c, id: nanoid() }))
         set({
           tasks: seedTasks(people),
           people,
           boards,
+          categories,
           activeBoardId: boards[0].id,
           currentPage: 'pinboard',
           boardView: 'kanban',

@@ -9,6 +9,7 @@ interface Props {
 
 export default function ArchiveManager({ onClose }: Props) {
   const tasks = useStore((s) => s.tasks).filter((t) => t.archived)
+  const categories = useStore((s) => s.categories)
   const restoreFromArchive = useStore((s) => s.restoreFromArchive)
   const markArchiveSeen = useStore((s) => s.markArchiveSeen)
   const markAllArchiveSeen = useStore((s) => s.markAllArchiveSeen)
@@ -67,7 +68,7 @@ export default function ArchiveManager({ onClose }: Props) {
                     </div>
                     <span
                       className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm"
-                      style={{ backgroundColor: categoryColor(task.category) }}
+                      style={{ backgroundColor: categoryColor(task.category, categories) }}
                     >
                       {task.category || 'Ohne Kategorie'}
                     </span>

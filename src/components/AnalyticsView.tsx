@@ -63,6 +63,7 @@ function TaskDetailModal({
 }) {
   const people = useStore((s) => s.people)
   const boards = useStore((s) => s.boards)
+  const categories = useStore((s) => s.categories)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
@@ -95,7 +96,7 @@ function TaskDetailModal({
                 >
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: categoryColor(task.category) }}
+                    style={{ backgroundColor: categoryColor(task.category, categories) }}
                   />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#151f76]">{task.title}</span>
                   {board && <span className="shrink-0 text-xs text-[#151f76]/50">{board.name}</span>}
@@ -133,6 +134,7 @@ export default function AnalyticsView({ onEdit }: Props) {
   const archivedCount = allTasks.filter((t) => t.archived).length
   const people = useStore((s) => s.people)
   const boards = useStore((s) => s.boards)
+  const categories = useStore((s) => s.categories)
   const [detail, setDetail] = useState<TaskDetail | null>(null)
 
   const doneCount = tasks.filter((t) => t.page === 'board' && t.columnId === 'done').length
@@ -166,7 +168,7 @@ export default function AnalyticsView({ onEdit }: Props) {
       map.set(key, [...(map.get(key) ?? []), t])
     })
     return Array.from(map.entries())
-      .map(([label, matching]) => ({ key: label, label, matching, color: categoryColor(label) }))
+      .map(([label, matching]) => ({ key: label, label, matching, color: categoryColor(label, categories) }))
       .sort((a, b) => b.matching.length - a.matching.length)
   })()
   const maxCategoryCount = Math.max(1, ...categoryCounts.map((c) => c.matching.length))
@@ -324,7 +326,7 @@ export default function AnalyticsView({ onEdit }: Props) {
                 >
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: categoryColor(task.category) }}
+                    style={{ backgroundColor: categoryColor(task.category, categories) }}
                   />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#151f76]">{task.title}</span>
                   {board && <span className="shrink-0 text-xs text-[#151f76]/50">{board.name}</span>}

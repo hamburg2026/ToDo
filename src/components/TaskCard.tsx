@@ -15,6 +15,7 @@ interface Props {
 
 export default function TaskCard({ task, dragging, compact, onEdit, dragHandleProps }: Props) {
   const people = useStore((s) => s.people)
+  const categories = useStore((s) => s.categories)
   const deleteTask = useStore((s) => s.deleteTask)
   const toggleChecklistItem = useStore((s) => s.toggleChecklistItem)
   const cardFont = useStore((s) => s.cardFont)
@@ -26,6 +27,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
   const status = task.status && task.status !== 'none' ? statusOption(task.status) : null
   const checklist = task.checklist ?? []
   const checklistDone = checklist.filter((i) => i.done).length
+  const isPonturo = task.category?.trim().toLowerCase() === 'ponturo'
 
   return (
     <div
@@ -42,6 +44,12 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       }}
     >
       <div className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-white/70 shadow-sm ring-1 ring-black/10" />
+
+      {isPonturo && (
+        <div className="pointer-events-none absolute -left-2.5 -top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-black/10">
+          <img src={`${import.meta.env.BASE_URL}brand/ponturo-icon.svg`} alt="" className="h-5 w-5" />
+        </div>
+      )}
 
       {status && (
         <div
@@ -156,7 +164,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
       <div className="flex items-center justify-between gap-2">
         <span
           className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm"
-          style={{ backgroundColor: categoryColor(task.category) }}
+          style={{ backgroundColor: categoryColor(task.category, categories) }}
         >
           {task.category || 'Ohne Kategorie'}
         </span>

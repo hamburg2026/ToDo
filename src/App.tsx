@@ -23,6 +23,7 @@ import BoardTabs from './components/BoardTabs'
 import TaskModal from './components/TaskModal'
 import PeopleManager from './components/PeopleManager'
 import BoardsManager from './components/BoardsManager'
+import CategoriesManager from './components/CategoriesManager'
 import SettingsPanel from './components/SettingsPanel'
 import ArchiveManager from './components/ArchiveManager'
 import TaskCard from './components/TaskCard'
@@ -61,6 +62,8 @@ export default function App() {
   const closePeopleManager = useStore((s) => s.closePeopleManager)
   const boardsManagerOpen = useStore((s) => s.boardsManagerOpen)
   const closeBoardsManager = useStore((s) => s.closeBoardsManager)
+  const categoriesManagerOpen = useStore((s) => s.categoriesManagerOpen)
+  const closeCategoriesManager = useStore((s) => s.closeCategoriesManager)
   const settingsOpen = useStore((s) => s.settingsOpen)
   const closeSettings = useStore((s) => s.closeSettings)
   const archiveOpen = useStore((s) => s.archiveOpen)
@@ -225,11 +228,13 @@ export default function App() {
           targetPage={modalTargetPage}
           onClose={() => setModalOpen(false)}
           onOpenPeople={() => useStore.getState().openPeopleManager()}
+          onOpenCategories={() => useStore.getState().openCategoriesManager()}
         />
       )}
 
       {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
       {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
+      {categoriesManagerOpen && <CategoriesManager onClose={closeCategoriesManager} />}
       {settingsOpen && <SettingsPanel onClose={closeSettings} />}
       {archiveOpen && <ArchiveManager onClose={closeArchive} />}
     </DndContext>
