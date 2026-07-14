@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { nanoid } from 'nanoid'
-import { X, Users, Hash, PenLine, CalendarDays, Star, Check, ChevronDown, ChevronUp, Plus, ListChecks } from 'lucide-react'
+import { X, Users, Hash, PenLine, CalendarDays, Star, Check, ChevronDown, ChevronUp, Plus, ListChecks, Tag } from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { CARD_COLORS, CATEGORIES, STATUS_OPTIONS, categoryColor } from '../lib/constants'
+import { CARD_COLORS, STATUS_OPTIONS, categoryColor } from '../lib/constants'
 import type { ChecklistItem, Page, Task, TaskStatus } from '../types'
 import HandwritingOverlay from './HandwritingOverlay'
 
@@ -12,11 +12,13 @@ interface Props {
   targetPage?: Page
   onClose: () => void
   onOpenPeople: () => void
+  onOpenCategories: () => void
 }
 
-export default function TaskModal({ taskId, initialPosition, targetPage, onClose, onOpenPeople }: Props) {
+export default function TaskModal({ taskId, initialPosition, targetPage, onClose, onOpenPeople, onOpenCategories }: Props) {
   const task = useStore((s) => s.tasks.find((t) => t.id === taskId))
   const people = useStore((s) => s.people)
+  const categories = useStore((s) => s.categories)
   const addTask = useStore((s) => s.addTask)
   const updateTask = useStore((s) => s.updateTask)
 
@@ -267,7 +269,16 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
             </div>
 
             <div className="min-w-0">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Kategorie</label>
+              <div className="mb-1 flex items-center justify-between gap-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Kategorie</label>
+                <button
+                  type="button"
+                  onClick={onOpenCategories}
+                  className="flex items-center gap-1 text-[11px] font-medium text-violet-300 hover:text-violet-200"
+                >
+                  <Tag size={12} /> Verwalten
+                </button>
+              </div>
               <input
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -275,13 +286,13 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
                 className="w-full rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
               />
               <div className="mt-1.5 flex flex-wrap gap-1">
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <button
-                    key={c.name}
+                    key={c.id}
                     type="button"
                     onClick={() => setCategory(c.name)}
                     className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white transition-transform hover:scale-105"
-                    style={{ backgroundColor: categoryColor(c.name), opacity: category === c.name ? 1 : 0.55 }}
+                    style={{ backgroundColor: categoryColor(c.name, categories), opacity: category === c.name ? 1 : 0.55 }}
                   >
                     {c.name}
                   </button>

@@ -24,13 +24,27 @@ export function statusOption(id: TaskStatus): StatusOption | null {
   return STATUS_OPTIONS.find((s) => s.id === id) ?? null
 }
 
-export const CATEGORIES: { name: string; color: string }[] = [
+export const DEFAULT_CATEGORIES: { name: string; color: string }[] = [
   { name: 'Arbeit', color: '#8b5cf6' },
   { name: 'Privat', color: '#22d3ee' },
   { name: 'Projekt', color: '#f59e0b' },
   { name: 'Dringend', color: '#fb7185' },
   { name: 'Idee', color: '#34d399' },
   { name: 'Sonstiges', color: '#94a3b8' },
+  { name: 'ponturo', color: '#0073d2' },
+]
+
+export const CATEGORY_COLOR_PALETTE = [
+  '#8b5cf6',
+  '#22d3ee',
+  '#f59e0b',
+  '#fb7185',
+  '#34d399',
+  '#60a5fa',
+  '#f472b6',
+  '#a3e635',
+  '#94a3b8',
+  '#0073d2',
 ]
 
 export const CARD_COLORS = [
@@ -116,8 +130,8 @@ export function hexToRgbTriplet(hex: string): string {
   return `${r} ${g} ${b}`
 }
 
-export function categoryColor(name: string): string {
-  const found = CATEGORIES.find((c) => c.name.toLowerCase() === name?.toLowerCase())
+export function categoryColor(name: string, categories: { name: string; color: string }[] = DEFAULT_CATEGORIES): string {
+  const found = categories.find((c) => c.name.toLowerCase() === name?.toLowerCase())
   if (found) return found.color
   // deterministic fallback color from string hash
   let hash = 0
