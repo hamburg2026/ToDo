@@ -46,6 +46,7 @@ interface StoreState {
 
   addTask: (draft: TaskDraft, position?: { x: number; y: number }, page?: Page) => Task
   updateTask: (id: string, patch: Partial<Task>) => void
+  toggleChecklistItem: (taskId: string, itemId: string) => void
   deleteTask: (id: string) => void
   moveTaskToColumn: (id: string, boardId: string, columnId: ColumnId, targetIndex?: number) => void
   reorderColumn: (boardId: string, columnId: ColumnId, orderedIds: string[]) => void
@@ -107,6 +108,7 @@ function seedTasks(people: Person[]): Task[] {
       end: null,
       category: 'Idee',
       hashtags: ['start', 'willkommen'],
+      checklist: [],
       today: false,
       important: false,
       status: 'none',
@@ -133,6 +135,11 @@ function seedTasks(people: Person[]): Task[] {
       end: null,
       category: 'Projekt',
       hashtags: ['planung'],
+      checklist: [
+        { id: nanoid(), text: 'Ziele festlegen', done: true },
+        { id: nanoid(), text: 'Meilensteine definieren', done: false },
+        { id: nanoid(), text: 'Team informieren', done: false },
+      ],
       today: true,
       important: true,
       status: 'in-arbeit',
@@ -234,6 +241,19 @@ export const useStore = create<StoreState>()(
       updateTask: (id, patch) =>
         set({
           tasks: get().tasks.map((t) => (t.id === id ? { ...t, ...patch, updatedAt: now() } : t)),
+        }),
+
+      toggleChecklistItem: (taskId, itemId) =>
+        set({
+          tasks: get().tasks.map((t) =>
+            t.id === taskId
+              ? {
+                  ...t,
+                  checklist: t.checklist.map((item) => (item.id === itemId ? { ...item, done: !item.done } : item)),
+                  updatedAt: now(),
+                }
+              : t,
+          ),
         }),
 
       deleteTask: (id) => set({ tasks: get().tasks.filter((t) => t.id !== id) }),

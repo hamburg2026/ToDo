@@ -20,6 +20,12 @@ export interface Column {
   accent: string
 }
 
+export interface ChecklistItem {
+  id: string
+  text: string
+  done: boolean
+}
+
 export interface Person {
   id: string
   name: string
@@ -42,6 +48,7 @@ export interface Task {
   end: string | null // ISO date (yyyy-mm-dd)
   category: string
   hashtags: string[]
+  checklist: ChecklistItem[]
   today: boolean
   important: boolean
   status: TaskStatus

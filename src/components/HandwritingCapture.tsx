@@ -32,6 +32,7 @@ export default function HandwritingCapture({ onClose, page }: Props) {
         end: null,
         category: '',
         hashtags: [],
+        checklist: [],
         today: false,
         important: false,
         status: 'none',

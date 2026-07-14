@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { X, Users, Hash, PenLine, CalendarDays, Star } from 'lucide-react'
+import { nanoid } from 'nanoid'
+import { X, Users, Hash, PenLine, CalendarDays, Star, Check, ChevronDown, ChevronUp, Plus, ListChecks } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { CARD_COLORS, CATEGORIES, STATUS_OPTIONS, categoryColor } from '../lib/constants'
-import type { Page, Task, TaskStatus } from '../types'
+import type { ChecklistItem, Page, Task, TaskStatus } from '../types'
 import HandwritingOverlay from './HandwritingOverlay'
 
 interface Props {
@@ -27,6 +28,9 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
   const [category, setCategory] = useState('')
   const [hashtags, setHashtags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
+  const [checklist, setChecklist] = useState<ChecklistItem[]>([])
+  const [checklistInput, setChecklistInput] = useState('')
+  const [checklistOpen, setChecklistOpen] = useState(false)
   const [color, setColor] = useState(CARD_COLORS[0])
   const [today, setToday] = useState(false)
   const [important, setImportant] = useState(false)
@@ -42,6 +46,8 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
       setEnd(task.end ?? '')
       setCategory(task.category)
       setHashtags(task.hashtags)
+      setChecklist(task.checklist ?? [])
+      setChecklistOpen((task.checklist ?? []).length > 0)
       setColor(task.color)
       setToday(task.today ?? false)
       setImportant(task.important ?? false)
@@ -54,12 +60,15 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
       setEnd('')
       setCategory('')
       setHashtags([])
+      setChecklist([])
+      setChecklistOpen(false)
       setColor(CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)])
       setToday(false)
       setImportant(false)
       setStatus('none')
     }
     setTagInput('')
+    setChecklistInput('')
   }, [task, taskId])
 
   function commitTag() {
@@ -79,6 +88,30 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
     }
   }
 
+  function addChecklistItem() {
+    const clean = checklistInput.trim()
+    if (!clean) return
+    setChecklist([...checklist, { id: nanoid(), text: clean, done: false }])
+    setChecklistInput('')
+  }
+
+  function handleChecklistKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      addChecklistItem()
+    } else if (e.key === 'Backspace' && !checklistInput && checklist.length > 0) {
+      setChecklist(checklist.slice(0, -1))
+    }
+  }
+
+  function toggleChecklistItem(id: string) {
+    setChecklist(checklist.map((item) => (item.id === id ? { ...item, done: !item.done } : item)))
+  }
+
+  function removeChecklistItem(id: string) {
+    setChecklist(checklist.filter((item) => item.id !== id))
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim()) return
@@ -90,6 +123,7 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
       end: end || null,
       category: category.trim(),
       hashtags,
+      checklist,
       color,
       today,
       important,
@@ -148,6 +182,62 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
               placeholder="Details, Kontext, Notizen…"
               className="w-full resize-none rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 px-3 py-2 text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
             />
+          </div>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => setChecklistOpen((v) => !v)}
+              className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55 hover:text-[#151f76]/80"
+            >
+              {checklistOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              <ListChecks size={13} />
+              Checkliste
+              {checklist.length > 0 && (
+                <span className="normal-case text-[#151f76]/40">
+                  ({checklist.filter((i) => i.done).length}/{checklist.length})
+                </span>
+              )}
+            </button>
+            {checklistOpen && (
+              <div className="space-y-1.5 rounded-lg border border-[#151f76]/10 bg-[#151f76]/4 p-2">
+                {checklist.map((item) => (
+                  <div key={item.id} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleChecklistItem(item.id)}
+                      aria-label={item.done ? 'Erledigt' : 'Offen'}
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                        item.done ? 'border-violet-400 bg-violet-400 text-white' : 'border-[#151f76]/25 text-transparent hover:border-violet-400'
+                      }`}
+                    >
+                      <Check size={12} />
+                    </button>
+                    <span className={`flex-1 text-sm ${item.done ? 'text-[#151f76]/40 line-through' : 'text-[#151f76]'}`}>
+                      {item.text}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeChecklistItem(item.id)}
+                      className="shrink-0 text-[#151f76]/35 hover:text-rose-500"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2 pt-0.5">
+                  <Plus size={14} className="shrink-0 text-[#151f76]/35" />
+                  <input
+                    value={checklistInput}
+                    onChange={(e) => setChecklistInput(e.target.value)}
+                    onKeyDown={handleChecklistKeyDown}
+                    onBlur={addChecklistItem}
+                    placeholder="Punkt hinzufügen + Enter"
+                    className="min-w-0 flex-1 bg-transparent px-0 py-0.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

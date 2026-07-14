@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarDays, CalendarRange, ChevronDown, ChevronUp, Star, Trash2 } from 'lucide-react'
+import { CalendarDays, CalendarRange, Check, ChevronDown, ChevronUp, Star, Trash2 } from 'lucide-react'
 import type { Task } from '../types'
 import { useStore } from '../store/useStore'
 import { categoryColor, statusOption, CARD_FONT_CLASSES, CARD_FONT_SIZE_CLASSES } from '../lib/constants'
@@ -16,12 +16,16 @@ interface Props {
 export default function TaskCard({ task, dragging, compact, onEdit, dragHandleProps }: Props) {
   const people = useStore((s) => s.people)
   const deleteTask = useStore((s) => s.deleteTask)
+  const toggleChecklistItem = useStore((s) => s.toggleChecklistItem)
   const cardFont = useStore((s) => s.cardFont)
   const cardFontSize = useStore((s) => s.cardFontSize)
   const assignee = people.find((p) => p.id === task.assigneeId)
   const sizeClasses = CARD_FONT_SIZE_CLASSES[cardFontSize]
   const [descOpen, setDescOpen] = useState(false)
+  const [checklistOpen, setChecklistOpen] = useState(false)
   const status = task.status && task.status !== 'none' ? statusOption(task.status) : null
+  const checklist = task.checklist ?? []
+  const checklistDone = checklist.filter((i) => i.done).length
 
   return (
     <div
@@ -89,6 +93,52 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
           </button>
           {descOpen && (
             <p className={`mt-1 ${sizeClasses.description} leading-snug text-slate-800/80`}>{task.description}</p>
+          )}
+        </div>
+      )}
+
+      {checklist.length > 0 && (
+        <div className="mb-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setChecklistOpen((v) => !v)
+            }}
+            onDoubleClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1 text-slate-700/70 hover:text-slate-900"
+          >
+            {checklistOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            <span className="text-[10px] font-semibold uppercase tracking-wide">
+              Checkliste ({checklistDone}/{checklist.length})
+            </span>
+          </button>
+          {checklistOpen && (
+            <div className="mt-1 space-y-1">
+              {checklist.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleChecklistItem(task.id, item.id)
+                  }}
+                  onDoubleClick={(e) => e.stopPropagation()}
+                  className="flex w-full items-center gap-1.5 text-left"
+                >
+                  <span
+                    className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 ${
+                      item.done ? 'border-slate-800/70 bg-slate-800/70 text-white' : 'border-slate-700/40 text-transparent'
+                    }`}
+                  >
+                    <Check size={9} />
+                  </span>
+                  <span className={`${sizeClasses.description} ${item.done ? 'text-slate-700/50 line-through' : 'text-slate-800/85'}`}>
+                    {item.text}
+                  </span>
+                </button>
+              ))}
+            </div>
           )}
         </div>
       )}
