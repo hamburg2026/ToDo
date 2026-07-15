@@ -10,7 +10,7 @@ export type CardFontSize = 'sm' | 'md' | 'lg'
 
 export type ThemeId = 'blue' | 'teal' | 'purple' | 'navy'
 
-export type ColumnId = 'backlog' | 'progress' | 'review' | 'done'
+export type ColumnId = 'backlog' | 'progress'
 
 export type TaskStatus = 'none' | 'offen' | 'in-arbeit' | 'erledigt' | 'blockiert'
 

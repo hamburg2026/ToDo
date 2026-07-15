@@ -11,8 +11,7 @@ interface Props {
 
 function isOverdue(task: Task): boolean {
   if (!task.end) return false
-  const done = task.page === 'board' && task.columnId === 'done'
-  return !done && daysUntil(task.end) < 0
+  return task.status !== 'erledigt' && daysUntil(task.end) < 0
 }
 
 interface BarRowProps {
@@ -137,7 +136,7 @@ export default function AnalyticsView({ onEdit }: Props) {
   const categories = useStore((s) => s.categories)
   const [detail, setDetail] = useState<TaskDetail | null>(null)
 
-  const doneCount = tasks.filter((t) => t.page === 'board' && t.columnId === 'done').length
+  const doneCount = tasks.filter((t) => t.status === 'erledigt').length
   const todayTasks = tasks.filter((t) => t.page === 'board' && t.today)
   const overdue = tasks.filter(isOverdue).sort((a, b) => daysUntil(a.end as string) - daysUntil(b.end as string))
 

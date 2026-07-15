@@ -3,8 +3,6 @@ import type { CardFont, CardFontSize, Column, TaskStatus, ThemeId } from '../typ
 export const COLUMNS: Column[] = [
   { id: 'backlog', title: 'Backlog', accent: '#151f76' },
   { id: 'progress', title: 'In Arbeit', accent: '#0073d2' },
-  { id: 'review', title: 'Review', accent: '#a60781' },
-  { id: 'done', title: 'Erledigt', accent: '#16cbaf' },
 ]
 
 export interface StatusOption {
