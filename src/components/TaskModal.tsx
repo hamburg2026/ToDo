@@ -46,6 +46,8 @@ export default function TaskModal({
   const [tagInput, setTagInput] = useState('')
   const [checklist, setChecklist] = useState<ChecklistItem[]>([])
   const [checklistInput, setChecklistInput] = useState('')
+  const [editingChecklistId, setEditingChecklistId] = useState<string | null>(null)
+  const [editingChecklistText, setEditingChecklistText] = useState('')
   const [localChecklistOpen, setLocalChecklistOpen] = useState(true)
   const [color, setColor] = useState(CARD_COLORS[0])
   const [today, setToday] = useState(false)
@@ -84,6 +86,7 @@ export default function TaskModal({
     }
     setTagInput('')
     setChecklistInput('')
+    setEditingChecklistId(null)
   }, [task, taskId])
 
   const checklistOpen = task ? storedChecklistOpen ?? true : localChecklistOpen
@@ -132,6 +135,28 @@ export default function TaskModal({
 
   function removeChecklistItem(id: string) {
     setChecklist(checklist.filter((item) => item.id !== id))
+  }
+
+  function startEditChecklistItem(item: ChecklistItem) {
+    setEditingChecklistId(item.id)
+    setEditingChecklistText(item.text)
+  }
+
+  function commitChecklistEdit() {
+    if (!editingChecklistId) return
+    const clean = editingChecklistText.trim()
+    setChecklist(checklist.map((item) => (item.id === editingChecklistId ? { ...item, text: clean || item.text } : item)))
+    setEditingChecklistId(null)
+  }
+
+  function handleChecklistEditKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      commitChecklistEdit()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setEditingChecklistId(null)
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -235,9 +260,24 @@ export default function TaskModal({
                     >
                       <Check size={12} />
                     </button>
-                    <span className={`flex-1 text-sm ${item.done ? 'text-[#151f76]/40 line-through' : 'text-[#151f76]'}`}>
-                      {item.text}
-                    </span>
+                    {editingChecklistId === item.id ? (
+                      <input
+                        autoFocus
+                        value={editingChecklistText}
+                        onChange={(e) => setEditingChecklistText(e.target.value)}
+                        onKeyDown={handleChecklistEditKeyDown}
+                        onBlur={commitChecklistEdit}
+                        className="min-w-0 flex-1 rounded-md border border-violet-400 bg-white/70 px-1.5 py-0.5 text-sm text-[#151f76] outline-none"
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => startEditChecklistItem(item)}
+                        className={`flex-1 truncate text-left text-sm ${item.done ? 'text-[#151f76]/40 line-through' : 'text-[#151f76]'}`}
+                      >
+                        {item.text}
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => removeChecklistItem(item.id)}
