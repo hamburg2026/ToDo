@@ -1,17 +1,22 @@
+import { useState } from 'react'
+import { Plus, PenLine } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { COLUMNS, ZOOM_STEP, clampZoom } from '../lib/constants'
 import KanbanColumn from './KanbanColumn'
 import ZoomControls from './ZoomControls'
+import HandwritingCapture from './HandwritingCapture'
 
 interface Props {
   onEdit: (id: string) => void
+  onCreate: () => void
 }
 
-export default function KanbanBoard({ onEdit }: Props) {
+export default function KanbanBoard({ onEdit, onCreate }: Props) {
   const activeBoardId = useStore((s) => s.activeBoardId)
   const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.boardId === activeBoardId && !t.archived)
   const zoom = useStore((s) => s.kanbanZoom)
   const setZoom = useStore((s) => s.setKanbanZoom)
+  const [handwritingOpen, setHandwritingOpen] = useState(false)
 
   function handleWheelZoom(e: React.WheelEvent) {
     if (!e.ctrlKey && !e.metaKey) return
@@ -40,6 +45,28 @@ export default function KanbanBoard({ onEdit }: Props) {
         onZoomOut={() => setZoom(zoom - ZOOM_STEP)}
         onReset={() => setZoom(1)}
       />
+
+      <div className="fixed bottom-8 left-8 z-30 flex items-center gap-3">
+        <button
+          onClick={onCreate}
+          className="flex items-center gap-2 rounded-full accent-gradient px-5 py-3 font-semibold text-white shadow-glow transition-transform hover:scale-105 active:scale-95"
+        >
+          <Plus size={18} />
+          Neue Aufgabe
+        </button>
+        <button
+          onClick={() => setHandwritingOpen(true)}
+          title="Handschriftlich erfassen (Apple Pencil)"
+          className="flex items-center gap-2 rounded-full border border-[#151f76]/12 bg-[#151f76]/6 px-4 py-3 font-semibold text-[#151f76] backdrop-blur transition-colors hover:bg-[#151f76]/10"
+        >
+          <PenLine size={17} />
+          Handschrift
+        </button>
+      </div>
+
+      {handwritingOpen && (
+        <HandwritingCapture onClose={() => setHandwritingOpen(false)} page="board" boardId={activeBoardId} />
+      )}
     </div>
   )
 }

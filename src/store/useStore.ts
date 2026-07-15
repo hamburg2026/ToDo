@@ -48,7 +48,7 @@ interface StoreState {
   markAllArchiveSeen: () => void
   setActiveTaskId: (id: string | null) => void
 
-  addTask: (draft: TaskDraft, position?: { x: number; y: number }, page?: Page) => Task
+  addTask: (draft: TaskDraft, position?: { x: number; y: number }, page?: Page, boardId?: string | null) => Task
   updateTask: (id: string, patch: Partial<Task>) => void
   toggleChecklistItem: (taskId: string, itemId: string) => void
   deleteTask: (id: string) => void
@@ -230,8 +230,9 @@ export const useStore = create<StoreState>()(
         }),
       setActiveTaskId: (id) => set({ activeTaskId: id }),
 
-      addTask: (draft, position, page = 'pinboard') => {
+      addTask: (draft, position, page = 'pinboard', boardId = null) => {
         const t = now()
+        const resolvedBoardId = page === 'board' ? boardId : null
         const task: Task = {
           ...draft,
           id: nanoid(),
@@ -239,9 +240,9 @@ export const useStore = create<StoreState>()(
           archiveUnseen: false,
           archivedAt: null,
           page,
-          boardId: null,
+          boardId: resolvedBoardId,
           columnId: 'backlog',
-          order: get().tasks.filter((x) => x.columnId === 'backlog' && x.page === page).length,
+          order: get().tasks.filter((x) => x.columnId === 'backlog' && x.page === page && x.boardId === resolvedBoardId).length,
           x: position?.x ?? 80 + Math.random() * 160,
           y: position?.y ?? 80 + Math.random() * 160,
           rotation: Math.random() * 6 - 3,

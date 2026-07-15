@@ -10,12 +10,13 @@ interface Props {
   taskId: string | null
   initialPosition?: { x: number; y: number }
   targetPage?: Page
+  targetBoardId?: string | null
   onClose: () => void
   onOpenPeople: () => void
   onOpenCategories: () => void
 }
 
-export default function TaskModal({ taskId, initialPosition, targetPage, onClose, onOpenPeople, onOpenCategories }: Props) {
+export default function TaskModal({ taskId, initialPosition, targetPage, targetBoardId, onClose, onOpenPeople, onOpenCategories }: Props) {
   const task = useStore((s) => s.tasks.find((t) => t.id === taskId))
   const people = useStore((s) => s.people)
   const categories = useStore((s) => s.categories)
@@ -134,7 +135,7 @@ export default function TaskModal({ taskId, initialPosition, targetPage, onClose
     if (task) {
       updateTask(task.id, payload as Partial<Task>)
     } else {
-      addTask(payload, initialPosition, targetPage)
+      addTask(payload, initialPosition, targetPage, targetBoardId)
     }
     onClose()
   }
