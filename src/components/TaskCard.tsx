@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { CalendarDays, CalendarRange, Check, ChevronDown, ChevronUp, Star, Trash2 } from 'lucide-react'
 import type { Task } from '../types'
 import { useStore } from '../store/useStore'
@@ -21,10 +20,12 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
   const toggleChecklistItem = useStore((s) => s.toggleChecklistItem)
   const cardFont = useStore((s) => s.cardFont)
   const cardFontSize = useStore((s) => s.cardFontSize)
+  const sectionState = useStore((s) => s.cardSectionState[task.id])
+  const setCardSectionOpen = useStore((s) => s.setCardSectionOpen)
   const assignee = people.find((p) => p.id === task.assigneeId)
   const sizeClasses = CARD_FONT_SIZE_CLASSES[cardFontSize]
-  const [descOpen, setDescOpen] = useState(false)
-  const [checklistOpen, setChecklistOpen] = useState(false)
+  const descOpen = sectionState?.details ?? true
+  const checklistOpen = sectionState?.checklist ?? true
   const status = task.status && task.status !== 'none' ? statusOption(task.status) : null
   const checklist = task.checklist ?? []
   const checklistDone = checklist.filter((i) => i.done).length
@@ -106,7 +107,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
             type="button"
             onClick={(e) => {
               e.stopPropagation()
-              setDescOpen((v) => !v)
+              setCardSectionOpen(task.id, 'details', !descOpen)
             }}
             onDoubleClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1 text-slate-700/70 hover:text-slate-900"
@@ -126,7 +127,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
             type="button"
             onClick={(e) => {
               e.stopPropagation()
-              setChecklistOpen((v) => !v)
+              setCardSectionOpen(task.id, 'checklist', !checklistOpen)
             }}
             onDoubleClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1 text-slate-700/70 hover:text-slate-900"

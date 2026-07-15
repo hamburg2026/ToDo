@@ -66,10 +66,10 @@ function TaskDetailModal({
   const categories = useStore((s) => s.categories)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
+        className="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
       >
         <div className="mb-4 flex items-center justify-between gap-2">
           <h2 className="text-lg font-bold text-[#151f76]">{detail.title}</h2>
