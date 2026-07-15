@@ -55,6 +55,7 @@ export default function App() {
   const setActiveBoardId = useStore((s) => s.setActiveBoardId)
   const setTaskPosition = useStore((s) => s.setTaskPosition)
   const sendTaskToPage = useStore((s) => s.sendTaskToPage)
+  const updateTask = useStore((s) => s.updateTask)
   const moveTaskToBoard = useStore((s) => s.moveTaskToBoard)
   const moveTaskToColumn = useStore((s) => s.moveTaskToColumn)
   const reorderColumn = useStore((s) => s.reorderColumn)
@@ -74,6 +75,7 @@ export default function App() {
   const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | undefined>(undefined)
   const [modalTargetPage, setModalTargetPage] = useState<Page>('pinboard')
   const [modalTargetBoardId, setModalTargetBoardId] = useState<string | null>(null)
+  const [modalInitialToday, setModalInitialToday] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const sensors = useSensors(
@@ -82,11 +84,17 @@ export default function App() {
 
   const activeTask = useMemo(() => tasks.find((t) => t.id === activeId) ?? null, [tasks, activeId])
 
-  function openCreateModal(position?: { x: number; y: number }, targetPage: Page = 'pinboard', boardId: string | null = null) {
+  function openCreateModal(
+    position?: { x: number; y: number },
+    targetPage: Page = 'pinboard',
+    boardId: string | null = null,
+    initialToday = false,
+  ) {
     setModalTaskId(null)
     setModalPosition(position)
     setModalTargetPage(targetPage)
     setModalTargetBoardId(boardId)
+    setModalInitialToday(initialToday)
     setModalOpen(true)
   }
 
@@ -117,10 +125,17 @@ export default function App() {
       return
     }
 
-    // Drag onto an edge tab (e.g. "Zur Pinnwand" or "Heute zu tun"): move the
-    // task to whichever page that edge tab currently targets.
+    // Drag onto an edge tab: either a real page move ("Zur Pinnwand", real
+    // Page value) or the "Heute zu tun" flag-only zone (sentinel 'today',
+    // not a Page — it just marks the board task as today's, it doesn't
+    // relocate it, so the board keeps showing it and we don't navigate).
     if (typeof over?.id === 'string' && over.id.startsWith('edge-nav-')) {
-      const targetPage = (over.data.current as { target?: Page } | undefined)?.target ?? 'pinboard'
+      const targetData = (over.data.current as { target?: Page | 'today' } | undefined)?.target
+      if (targetData === 'today') {
+        if (task.page === 'board') updateTask(task.id, { today: true })
+        return
+      }
+      const targetPage: Page = targetData ?? 'pinboard'
       const randX = 200 + Math.random() * 500
       const randY = 150 + Math.random() * 400
       sendTaskToPage(task.id, targetPage, { x: randX, y: randY })
@@ -128,12 +143,12 @@ export default function App() {
       return
     }
 
-    if (task.page === 'pinboard' || task.page === 'today') {
-      // The pinboard/today canvases can be zoomed (see Pinboard.tsx /
-      // TodayBoard.tsx), which scales on-screen pixels relative to the
-      // underlying, unscaled coordinate space that task.x/y live in — so the
-      // raw pointer delta needs to be un-scaled before it's applied.
-      const zoom = task.page === 'pinboard' ? useStore.getState().pinboardZoom : useStore.getState().todayZoom
+    if (task.page === 'pinboard') {
+      // The Pinnwand canvas can be zoomed (see Pinboard.tsx), which scales
+      // on-screen pixels relative to the underlying, unscaled coordinate
+      // space that task.x/y live in — so the raw pointer delta needs to be
+      // un-scaled before it's applied.
+      const zoom = useStore.getState().pinboardZoom
       const nextX = Math.min(Math.max(0, task.x + delta.x / zoom), CANVAS_W - CARD_W)
       const nextY = Math.min(Math.max(0, task.y + delta.y / zoom), CANVAS_H - CARD_H)
       setTaskPosition(task.id, nextX, nextY)
@@ -191,7 +206,7 @@ export default function App() {
           <main className="relative z-0 flex-1 overflow-hidden">
             {currentPage === 'pinboard' && <Pinboard onCreate={openCreateModal} onEdit={openEditModal} />}
             {currentPage === 'today' && (
-              <TodayBoard onCreate={(position) => openCreateModal(position, 'today')} onEdit={openEditModal} />
+              <TodayBoard onCreate={() => openCreateModal(undefined, 'board', activeBoardId, true)} onEdit={openEditModal} />
             )}
             {currentPage === 'board' && boardView === 'kanban' && (
               <KanbanBoard onEdit={openEditModal} onCreate={() => openCreateModal(undefined, 'board', activeBoardId)} />
@@ -207,23 +222,15 @@ export default function App() {
             <EdgeZone side="left" id="edge-nav-left-pinboard" label="Zur Pinnwand" target="pinboard" active slot="top" />
             <EdgeZone side="left" id="edge-nav-left-today" label="Heute zu tun" target="today" active slot="bottom" />
           </>
-        ) : (
-          <EdgeZone
-            side="left"
-            label={currentPage === 'pinboard' ? 'Heute zu tun' : 'Zur Pinnwand'}
-            target={currentPage === 'pinboard' ? 'today' : 'pinboard'}
-            active={currentPage === 'pinboard' || currentPage === 'today'}
-          />
-        )}
+        ) : currentPage === 'today' ? (
+          <EdgeZone side="left" label="Zur Pinnwand" target="pinboard" active />
+        ) : null}
 
         <DragOverlay style={{ zIndex: 9999 }}>
           {activeTask ? (
             <div
               style={{
-                transform:
-                  activeTask.page === 'pinboard' || activeTask.page === 'today'
-                    ? `rotate(${activeTask.rotation}deg)`
-                    : undefined,
+                transform: activeTask.page === 'pinboard' ? `rotate(${activeTask.rotation}deg)` : undefined,
               }}
             >
               <TaskCard task={activeTask} dragging />
@@ -238,6 +245,7 @@ export default function App() {
           initialPosition={modalPosition}
           targetPage={modalTargetPage}
           targetBoardId={modalTargetBoardId}
+          initialToday={modalInitialToday}
           onClose={() => setModalOpen(false)}
           onOpenPeople={() => useStore.getState().openPeopleManager()}
           onOpenCategories={() => useStore.getState().openCategoriesManager()}

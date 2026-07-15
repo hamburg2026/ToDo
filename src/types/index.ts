@@ -1,4 +1,4 @@
-export type Page = 'pinboard' | 'today' | 'board'
+export type Page = 'pinboard' | 'board'
 
 export type AppView = 'pinboard' | 'today' | 'board' | 'analytics'
 
