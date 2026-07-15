@@ -1,13 +1,39 @@
 import { useState } from 'react'
+import { useDraggable } from '@dnd-kit/core'
 import { Plus, PenLine } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { CARD_FONT_CLASSES } from '../lib/constants'
+import type { Task } from '../types'
 import HandwritingCapture from './HandwritingCapture'
 import TaskCard from './TaskCard'
 
 interface Props {
   onCreate: () => void
   onEdit: (id: string) => void
+}
+
+// Board tasks shown here have no meaningful x/y (their real position is
+// their board/column), so this is a plain draggable, not a freeform-canvas
+// or sortable one — it only needs to work as a drag *source* so a card can
+// be sent to a different board (right-edge tabs) or back to the Pinnwand
+// (left-edge zone).
+function DraggableTodayCard({ task, onEdit }: { task: Task; onEdit: () => void }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: task.id,
+    data: { type: 'today-card', task },
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{ opacity: isDragging ? 0.4 : 1, touchAction: 'none' }}
+      className="cursor-grab active:cursor-grabbing"
+    >
+      <TaskCard task={task} dragging={isDragging} onEdit={onEdit} />
+    </div>
+  )
 }
 
 export default function TodayBoard({ onCreate, onEdit }: Props) {
@@ -44,7 +70,7 @@ export default function TodayBoard({ onCreate, onEdit }: Props) {
                       {board.name}
                     </div>
                   )}
-                  <TaskCard task={task} onEdit={() => onEdit(task.id)} />
+                  <DraggableTodayCard task={task} onEdit={() => onEdit(task.id)} />
                 </div>
               )
             })}
