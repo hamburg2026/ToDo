@@ -32,6 +32,8 @@ export default function TaskModal({
   const categories = useStore((s) => s.categories)
   const addTask = useStore((s) => s.addTask)
   const updateTask = useStore((s) => s.updateTask)
+  const storedChecklistOpen = useStore((s) => (taskId ? s.cardSectionState[taskId]?.checklist : undefined))
+  const setCardSectionOpen = useStore((s) => s.setCardSectionOpen)
   const isBoardContext = task ? task.page === 'board' : targetPage === 'board'
 
   const [title, setTitle] = useState('')
@@ -44,7 +46,7 @@ export default function TaskModal({
   const [tagInput, setTagInput] = useState('')
   const [checklist, setChecklist] = useState<ChecklistItem[]>([])
   const [checklistInput, setChecklistInput] = useState('')
-  const [checklistOpen, setChecklistOpen] = useState(false)
+  const [localChecklistOpen, setLocalChecklistOpen] = useState(true)
   const [color, setColor] = useState(CARD_COLORS[0])
   const [today, setToday] = useState(false)
   const [important, setImportant] = useState(false)
@@ -61,7 +63,6 @@ export default function TaskModal({
       setCategory(task.category)
       setHashtags(task.hashtags)
       setChecklist(task.checklist ?? [])
-      setChecklistOpen((task.checklist ?? []).length > 0)
       setColor(task.color)
       setToday(task.today ?? false)
       setImportant(task.important ?? false)
@@ -75,7 +76,7 @@ export default function TaskModal({
       setCategory('')
       setHashtags([])
       setChecklist([])
-      setChecklistOpen(false)
+      setLocalChecklistOpen(true)
       setColor(CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)])
       setToday(initialToday ?? false)
       setImportant(false)
@@ -84,6 +85,13 @@ export default function TaskModal({
     setTagInput('')
     setChecklistInput('')
   }, [task, taskId])
+
+  const checklistOpen = task ? storedChecklistOpen ?? true : localChecklistOpen
+
+  function toggleChecklistSection() {
+    if (task) setCardSectionOpen(task.id, 'checklist', !checklistOpen)
+    else setLocalChecklistOpen((v) => !v)
+  }
 
   function commitTag() {
     const clean = tagInput.trim().replace(/^#/, '').replace(/\s+/g, '-')
@@ -152,11 +160,11 @@ export default function TaskModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
-        className="flex max-h-[88vh] w-full max-w-lg flex-col rounded-2xl glass shadow-glow animate-pop-in"
+        className="flex max-h-[88dvh] w-full max-w-lg flex-col rounded-2xl glass shadow-glow animate-pop-in"
       >
         <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-6">
           <h2 className="text-lg font-bold text-[#151f76]">{task ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2>
@@ -201,7 +209,7 @@ export default function TaskModal({
           <div>
             <button
               type="button"
-              onClick={() => setChecklistOpen((v) => !v)}
+              onClick={toggleChecklistSection}
               className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55 hover:text-[#151f76]/80"
             >
               {checklistOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}

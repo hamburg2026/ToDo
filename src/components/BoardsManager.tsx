@@ -38,7 +38,7 @@ export default function BoardsManager({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-md rounded-2xl glass p-6 shadow-glow animate-pop-in"

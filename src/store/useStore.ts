@@ -23,6 +23,10 @@ interface StoreState {
   settingsOpen: boolean
   archiveOpen: boolean
   activeTaskId: string | null
+  // Remembers whether a task's "Details"/"Checkliste" sections are expanded,
+  // keyed by task id. Both default open when a task has no entry here yet;
+  // an entry only exists once the user has explicitly toggled a section.
+  cardSectionState: Record<string, { details?: boolean; checklist?: boolean }>
 
   setCurrentPage: (page: AppView) => void
   setBoardView: (view: BoardView) => void
@@ -49,6 +53,7 @@ interface StoreState {
   addTask: (draft: TaskDraft, position?: { x: number; y: number }, page?: Page, boardId?: string | null) => Task
   updateTask: (id: string, patch: Partial<Task>) => void
   toggleChecklistItem: (taskId: string, itemId: string) => void
+  setCardSectionOpen: (taskId: string, section: 'details' | 'checklist', open: boolean) => void
   deleteTask: (id: string) => void
   moveTaskToColumn: (id: string, boardId: string, columnId: ColumnId, targetIndex?: number) => void
   reorderColumn: (boardId: string, columnId: ColumnId, orderedIds: string[]) => void
@@ -190,6 +195,7 @@ export const useStore = create<StoreState>()(
       settingsOpen: false,
       archiveOpen: false,
       activeTaskId: null,
+      cardSectionState: {},
 
       setCurrentPage: (page) => set({ currentPage: page }),
       setBoardView: (view) => set({ boardView: view }),
@@ -266,6 +272,14 @@ export const useStore = create<StoreState>()(
                 }
               : t,
           ),
+        }),
+
+      setCardSectionOpen: (taskId, section, open) =>
+        set({
+          cardSectionState: {
+            ...get().cardSectionState,
+            [taskId]: { ...get().cardSectionState[taskId], [section]: open },
+          },
         }),
 
       deleteTask: (id) => set({ tasks: get().tasks.filter((t) => t.id !== id) }),
