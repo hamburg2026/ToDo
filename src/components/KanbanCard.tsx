@@ -22,7 +22,7 @@ export default function KanbanCard({ task, onEdit }: Props) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="mb-3 cursor-grab active:cursor-grabbing">
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
       <TaskCard task={task} compact onEdit={onEdit} />
     </div>
   )

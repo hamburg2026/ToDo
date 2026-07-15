@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
 import type { Column, Task } from '../types'
 import KanbanCard from './KanbanCard'
 
@@ -13,7 +13,7 @@ export default function KanbanColumn({ column, tasks, onEdit }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id, data: { type: 'column', columnId: column.id } })
 
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col rounded-2xl glass">
+    <div className="flex h-full w-[38rem] shrink-0 flex-col rounded-2xl glass">
       <div className="flex items-center justify-between rounded-t-2xl border-b border-[#151f76]/10 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: column.accent }} />
@@ -28,13 +28,15 @@ export default function KanbanColumn({ column, tasks, onEdit }: Props) {
           isOver ? 'bg-[#151f76]/4' : ''
         }`}
       >
-        <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
-          {tasks
-            .slice()
-            .sort((a, b) => a.order - b.order)
-            .map((task) => (
-              <KanbanCard key={task.id} task={task} onEdit={() => onEdit(task.id)} />
-            ))}
+        <SortableContext items={tasks.map((t) => t.id)} strategy={rectSortingStrategy}>
+          <div className="grid grid-cols-2 gap-3">
+            {tasks
+              .slice()
+              .sort((a, b) => a.order - b.order)
+              .map((task) => (
+                <KanbanCard key={task.id} task={task} onEdit={() => onEdit(task.id)} />
+              ))}
+          </div>
         </SortableContext>
         {tasks.length === 0 && (
           <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-[#151f76]/10 text-xs text-[#151f76]/40">

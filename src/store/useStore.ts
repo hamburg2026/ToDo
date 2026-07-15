@@ -535,17 +535,30 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: 'taskwall-storage',
-      version: 1,
-      // v0 -> v1: "today" was a distinct task location (its own freeform page);
-      // it's now just a `today` flag on board tasks, so any task still parked
-      // on that now-removed page location is routed back to the Pinnwand.
-      migrate: (persistedState) => {
-        const state = persistedState as { tasks?: Array<Omit<Task, 'page'> & { page: string }> } | undefined
-        if (state?.tasks) {
+      version: 2,
+      migrate: (persistedState, version) => {
+        const state = persistedState as
+          | { tasks?: Array<Omit<Task, 'page' | 'columnId'> & { page: string; columnId: string }> }
+          | undefined
+        if (!state?.tasks) return state
+
+        if (version < 1) {
+          // "today" was a distinct task location (its own freeform page); it's
+          // now just a `today` flag on board tasks, so any task still parked
+          // on that now-removed page location is routed back to the Pinnwand.
           state.tasks = state.tasks.map((t) =>
             t.page === 'today' ? { ...t, page: 'pinboard', boardId: null, today: false } : t,
           )
         }
+
+        if (version < 2) {
+          // The "Review" and "Erledigt" Kanban columns were removed; fold
+          // their tasks into "In Arbeit" rather than losing them from view.
+          state.tasks = state.tasks.map((t) =>
+            t.columnId === 'review' || t.columnId === 'done' ? { ...t, columnId: 'progress' } : t,
+          )
+        }
+
         return state
       },
     },
