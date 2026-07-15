@@ -17,6 +17,7 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
   const people = useStore((s) => s.people)
   const categories = useStore((s) => s.categories)
   const deleteTask = useStore((s) => s.deleteTask)
+  const updateTask = useStore((s) => s.updateTask)
   const toggleChecklistItem = useStore((s) => s.toggleChecklistItem)
   const cardFont = useStore((s) => s.cardFont)
   const cardFontSize = useStore((s) => s.cardFontSize)
@@ -71,6 +72,20 @@ export default function TaskCard({ task, dragging, compact, onEdit, dragHandlePr
           <h3 className={`${CARD_FONT_CLASSES[cardFont]} ${sizeClasses.title} font-medium leading-snug text-slate-900`}>{task.title}</h3>
         </div>
         <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          {task.page === 'board' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                updateTask(task.id, { today: !task.today })
+              }}
+              onDoubleClick={(e) => e.stopPropagation()}
+              className={`rounded-md p-1 ${task.today ? 'bg-white/70 text-slate-900' : 'bg-white/50 hover:bg-white/70'}`}
+              aria-label={task.today ? 'Nicht mehr für heute markieren' : 'Für heute markieren'}
+              title={task.today ? 'Nicht mehr für heute markieren' : 'Für heute markieren'}
+            >
+              <CalendarDays size={13} />
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation()

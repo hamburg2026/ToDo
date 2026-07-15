@@ -6,7 +6,10 @@ interface Props {
   side: 'left' | 'right'
   label: string
   active: boolean
-  target: Page
+  // A real Page relocates the task; the 'today' sentinel isn't a Page at
+  // all — it just flags a board task as today's without moving it, so App.tsx
+  // reads it separately at drop time and skips the page-move/navigate logic.
+  target: Page | 'today'
   id?: string
   slot?: 'full' | 'top' | 'bottom'
 }

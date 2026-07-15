@@ -7,6 +7,7 @@ interface Props {
   onClose: () => void
   page?: Page
   boardId?: string | null
+  defaultToday?: boolean
 }
 
 function splitIntoTitleAndDescription(raw: string): { title: string; description: string } {
@@ -18,7 +19,7 @@ function splitIntoTitleAndDescription(raw: string): { title: string; description
   return { title: lines[0].slice(0, 120), description: lines.slice(1).join('\n') }
 }
 
-export default function HandwritingCapture({ onClose, page, boardId }: Props) {
+export default function HandwritingCapture({ onClose, page, boardId, defaultToday }: Props) {
   const addTask = useStore((s) => s.addTask)
 
   function handleSave(raw: string) {
@@ -34,7 +35,7 @@ export default function HandwritingCapture({ onClose, page, boardId }: Props) {
         category: '',
         hashtags: [],
         checklist: [],
-        today: false,
+        today: defaultToday ?? false,
         important: false,
         status: 'none',
         color: randomPick(CARD_COLORS),

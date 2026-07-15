@@ -11,17 +11,28 @@ interface Props {
   initialPosition?: { x: number; y: number }
   targetPage?: Page
   targetBoardId?: string | null
+  initialToday?: boolean
   onClose: () => void
   onOpenPeople: () => void
   onOpenCategories: () => void
 }
 
-export default function TaskModal({ taskId, initialPosition, targetPage, targetBoardId, onClose, onOpenPeople, onOpenCategories }: Props) {
+export default function TaskModal({
+  taskId,
+  initialPosition,
+  targetPage,
+  targetBoardId,
+  initialToday,
+  onClose,
+  onOpenPeople,
+  onOpenCategories,
+}: Props) {
   const task = useStore((s) => s.tasks.find((t) => t.id === taskId))
   const people = useStore((s) => s.people)
   const categories = useStore((s) => s.categories)
   const addTask = useStore((s) => s.addTask)
   const updateTask = useStore((s) => s.updateTask)
+  const isBoardContext = task ? task.page === 'board' : targetPage === 'board'
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -66,7 +77,7 @@ export default function TaskModal({ taskId, initialPosition, targetPage, targetB
       setChecklist([])
       setChecklistOpen(false)
       setColor(CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)])
-      setToday(false)
+      setToday(initialToday ?? false)
       setImportant(false)
       setStatus('none')
     }
@@ -374,11 +385,15 @@ export default function TaskModal({ taskId, initialPosition, targetPage, targetB
             <div className="flex gap-2">
               <button
                 type="button"
+                disabled={!isBoardContext}
                 onClick={() => setToday((v) => !v)}
+                title={!isBoardContext ? 'Erst in ein Board verschieben, um dies zu markieren' : undefined}
                 className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                  today
-                    ? 'border-violet-400 bg-violet-500/15 text-[#151f76]'
-                    : 'border-[#151f76]/10 bg-[#151f76]/4 text-[#151f76]/65 hover:bg-[#151f76]/6'
+                  !isBoardContext
+                    ? 'cursor-not-allowed border-[#151f76]/10 bg-[#151f76]/4 text-[#151f76]/30'
+                    : today
+                      ? 'border-violet-400 bg-violet-500/15 text-[#151f76]'
+                      : 'border-[#151f76]/10 bg-[#151f76]/4 text-[#151f76]/65 hover:bg-[#151f76]/6'
                 }`}
               >
                 <CalendarDays size={14} />

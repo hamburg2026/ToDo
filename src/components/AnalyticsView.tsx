@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarCheck2, Hash, LayoutDashboard, PinIcon, Users, X } from 'lucide-react'
+import { AlertTriangle, Hash, LayoutDashboard, PinIcon, Users, X } from 'lucide-react'
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import { COLUMNS, categoryColor } from '../lib/constants'
@@ -138,6 +138,7 @@ export default function AnalyticsView({ onEdit }: Props) {
   const [detail, setDetail] = useState<TaskDetail | null>(null)
 
   const doneCount = tasks.filter((t) => t.page === 'board' && t.columnId === 'done').length
+  const todayTasks = tasks.filter((t) => t.page === 'board' && t.today)
   const overdue = tasks.filter(isOverdue).sort((a, b) => daysUntil(a.end as string) - daysUntil(b.end as string))
 
   const personCounts = [
@@ -146,9 +147,11 @@ export default function AnalyticsView({ onEdit }: Props) {
   ].sort((a, b) => b.matching.length - a.matching.length)
   const maxPersonCount = Math.max(1, ...personCounts.map((p) => p.matching.length))
 
+  // "Heute zu tun" is a cross-cutting flag on board tasks, not a distinct
+  // location, so it's surfaced as its own stat tile below rather than as a
+  // bucket here — a bucket here would double-count tasks against their board.
   const boardCounts = [
     { key: 'pinboard', label: 'Pinnwand', color: '#94a3b8', matching: tasks.filter((t) => t.page === 'pinboard') },
-    { key: 'today', label: 'Heute zu tun', color: '#0073d2', matching: tasks.filter((t) => t.page === 'today') },
     ...boards.map((b) => ({ key: b.id, label: b.name, color: b.color, matching: tasks.filter((t) => t.page === 'board' && t.boardId === b.id) })),
   ].sort((a, b) => b.matching.length - a.matching.length)
   const maxBoardCount = Math.max(1, ...boardCounts.map((b) => b.matching.length))
@@ -188,8 +191,9 @@ export default function AnalyticsView({ onEdit }: Props) {
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto pl-6 pr-24 py-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
         <StatTile label="Gesamt Aufgaben" value={tasks.length} />
+        <StatTile label="Heute" value={todayTasks.length} />
         <StatTile label="Überfällig" value={overdue.length} tone="danger" />
         <StatTile label="Erledigt" value={doneCount} />
         <StatTile label="Archiviert" value={archivedCount} />
@@ -235,8 +239,6 @@ export default function AnalyticsView({ onEdit }: Props) {
                 icon={
                   b.key === 'pinboard' ? (
                     <PinIcon size={14} className="shrink-0 text-[#151f76]/50" />
-                  ) : b.key === 'today' ? (
-                    <CalendarCheck2 size={14} className="shrink-0 text-[#151f76]/50" />
                   ) : (
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: b.color }} />
                   )

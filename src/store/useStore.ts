@@ -16,7 +16,6 @@ interface StoreState {
   cardFontSize: CardFontSize
   theme: ThemeId
   pinboardZoom: number
-  todayZoom: number
   kanbanZoom: number
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
@@ -31,7 +30,6 @@ interface StoreState {
   setCardFontSize: (size: CardFontSize) => void
   setTheme: (theme: ThemeId) => void
   setPinboardZoom: (zoom: number) => void
-  setTodayZoom: (zoom: number) => void
   setKanbanZoom: (zoom: number) => void
   openPeopleManager: () => void
   closePeopleManager: () => void
@@ -185,7 +183,6 @@ export const useStore = create<StoreState>()(
       cardFontSize: 'md',
       theme: 'blue',
       pinboardZoom: 1,
-      todayZoom: 1,
       kanbanZoom: 1,
       peopleManagerOpen: false,
       boardsManagerOpen: false,
@@ -200,7 +197,6 @@ export const useStore = create<StoreState>()(
       setCardFontSize: (size) => set({ cardFontSize: size }),
       setTheme: (theme) => set({ theme }),
       setPinboardZoom: (zoom) => set({ pinboardZoom: clampZoom(zoom) }),
-      setTodayZoom: (zoom) => set({ todayZoom: clampZoom(zoom) }),
       setKanbanZoom: (zoom) => set({ kanbanZoom: clampZoom(zoom) }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
       closePeopleManager: () => set({ peopleManagerOpen: false }),
@@ -314,7 +310,15 @@ export const useStore = create<StoreState>()(
         set({
           tasks: tasks.map((t) =>
             t.id === id
-              ? { ...t, page, x: position?.x ?? t.x, y: position?.y ?? t.y, updatedAt: now() }
+              ? {
+                  ...t,
+                  page,
+                  boardId: page === 'pinboard' ? null : t.boardId,
+                  today: page === 'pinboard' ? false : t.today,
+                  x: position?.x ?? t.x,
+                  y: position?.y ?? t.y,
+                  updatedAt: now(),
+                }
               : t,
           ),
         })
@@ -515,6 +519,21 @@ export const useStore = create<StoreState>()(
         })
       },
     }),
-    { name: 'taskwall-storage' },
+    {
+      name: 'taskwall-storage',
+      version: 1,
+      // v0 -> v1: "today" was a distinct task location (its own freeform page);
+      // it's now just a `today` flag on board tasks, so any task still parked
+      // on that now-removed page location is routed back to the Pinnwand.
+      migrate: (persistedState) => {
+        const state = persistedState as { tasks?: Array<Omit<Task, 'page'> & { page: string }> } | undefined
+        if (state?.tasks) {
+          state.tasks = state.tasks.map((t) =>
+            t.page === 'today' ? { ...t, page: 'pinboard', boardId: null, today: false } : t,
+          )
+        }
+        return state
+      },
+    },
   ),
 )
