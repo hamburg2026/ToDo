@@ -73,6 +73,7 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | undefined>(undefined)
   const [modalTargetPage, setModalTargetPage] = useState<Page>('pinboard')
+  const [modalTargetBoardId, setModalTargetBoardId] = useState<string | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const sensors = useSensors(
@@ -81,10 +82,11 @@ export default function App() {
 
   const activeTask = useMemo(() => tasks.find((t) => t.id === activeId) ?? null, [tasks, activeId])
 
-  function openCreateModal(position?: { x: number; y: number }, targetPage: Page = 'pinboard') {
+  function openCreateModal(position?: { x: number; y: number }, targetPage: Page = 'pinboard', boardId: string | null = null) {
     setModalTaskId(null)
     setModalPosition(position)
     setModalTargetPage(targetPage)
+    setModalTargetBoardId(boardId)
     setModalOpen(true)
   }
 
@@ -191,19 +193,28 @@ export default function App() {
             {currentPage === 'today' && (
               <TodayBoard onCreate={(position) => openCreateModal(position, 'today')} onEdit={openEditModal} />
             )}
-            {currentPage === 'board' && boardView === 'kanban' && <KanbanBoard onEdit={openEditModal} />}
+            {currentPage === 'board' && boardView === 'kanban' && (
+              <KanbanBoard onEdit={openEditModal} onCreate={() => openCreateModal(undefined, 'board', activeBoardId)} />
+            )}
             {currentPage === 'board' && boardView === 'plan' && <PlanView onEdit={openEditModal} />}
             {currentPage === 'analytics' && <AnalyticsView onEdit={openEditModal} />}
           </main>
         </div>
 
         <BoardTabs />
-        <EdgeZone
-          side="left"
-          label={currentPage === 'pinboard' ? 'Heute zu tun' : 'Zur Pinnwand'}
-          target={currentPage === 'pinboard' ? 'today' : 'pinboard'}
-          active={currentPage === 'pinboard' || currentPage === 'today' || currentPage === 'board'}
-        />
+        {currentPage === 'board' ? (
+          <>
+            <EdgeZone side="left" id="edge-nav-left-pinboard" label="Zur Pinnwand" target="pinboard" active slot="top" />
+            <EdgeZone side="left" id="edge-nav-left-today" label="Heute zu tun" target="today" active slot="bottom" />
+          </>
+        ) : (
+          <EdgeZone
+            side="left"
+            label={currentPage === 'pinboard' ? 'Heute zu tun' : 'Zur Pinnwand'}
+            target={currentPage === 'pinboard' ? 'today' : 'pinboard'}
+            active={currentPage === 'pinboard' || currentPage === 'today'}
+          />
+        )}
 
         <DragOverlay style={{ zIndex: 9999 }}>
           {activeTask ? (
@@ -226,6 +237,7 @@ export default function App() {
           taskId={modalTaskId}
           initialPosition={modalPosition}
           targetPage={modalTargetPage}
+          targetBoardId={modalTargetBoardId}
           onClose={() => setModalOpen(false)}
           onOpenPeople={() => useStore.getState().openPeopleManager()}
           onOpenCategories={() => useStore.getState().openCategoriesManager()}

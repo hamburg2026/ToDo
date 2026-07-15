@@ -6,6 +6,7 @@ import HandwritingOverlay from './HandwritingOverlay'
 interface Props {
   onClose: () => void
   page?: Page
+  boardId?: string | null
 }
 
 function splitIntoTitleAndDescription(raw: string): { title: string; description: string } {
@@ -17,7 +18,7 @@ function splitIntoTitleAndDescription(raw: string): { title: string; description
   return { title: lines[0].slice(0, 120), description: lines.slice(1).join('\n') }
 }
 
-export default function HandwritingCapture({ onClose, page }: Props) {
+export default function HandwritingCapture({ onClose, page, boardId }: Props) {
   const addTask = useStore((s) => s.addTask)
 
   function handleSave(raw: string) {
@@ -40,6 +41,7 @@ export default function HandwritingCapture({ onClose, page }: Props) {
       },
       undefined,
       page,
+      boardId,
     )
     onClose()
   }
