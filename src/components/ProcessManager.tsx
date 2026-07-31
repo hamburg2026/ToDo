@@ -29,7 +29,7 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
   const [editTaskTitle, setEditTaskTitle] = useState('')
 
   const [runningId, setRunningId] = useState<string | null>(null)
-  const [runAssigneeId, setRunAssigneeId] = useState<string | null>(null)
+  const [runEmployeePersonId, setRunEmployeePersonId] = useState<string | null>(null)
   const [runStartDate, setRunStartDate] = useState('')
 
   function handleAdd(e: React.FormEvent) {
@@ -73,14 +73,14 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
 
   function startRun(processId: string) {
     setRunningId(processId)
-    setRunAssigneeId(null)
+    setRunEmployeePersonId(null)
     setRunStartDate('')
   }
 
   function handleRun(processId: string, e: React.FormEvent) {
     e.preventDefault()
-    if (!runStartDate) return
-    runProcess(processId, { assigneeId: runAssigneeId, startDate: runStartDate })
+    if (!runStartDate || !runEmployeePersonId) return
+    runProcess(processId, { employeePersonId: runEmployeePersonId, startDate: runStartDate })
     setRunningId(null)
     onClose()
   }
@@ -245,7 +245,9 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
                   >
                     <div>
                       <div className="mb-1 flex items-center justify-between gap-1">
-                        <label className="text-[11px] font-semibold uppercase tracking-wide text-[#151f76]/55">Neuer Mitarbeiter</label>
+                        <label className="text-[11px] font-semibold uppercase tracking-wide text-[#151f76]/55">
+                          Neuer Mitarbeiter (Board-Name)
+                        </label>
                         <button
                           type="button"
                           onClick={onOpenPeople}
@@ -255,17 +257,21 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
                         </button>
                       </div>
                       <select
-                        value={runAssigneeId ?? ''}
-                        onChange={(e) => setRunAssigneeId(e.target.value || null)}
+                        required
+                        value={runEmployeePersonId ?? ''}
+                        onChange={(e) => setRunEmployeePersonId(e.target.value || null)}
                         className="w-full rounded-lg border border-[#151f76]/10 bg-white/70 px-3 py-2 text-sm text-[#151f76] outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
                       >
-                        <option value="" className="bg-white">Nicht zugewiesen</option>
+                        <option value="" disabled className="bg-white">Person auswählen…</option>
                         {people.map((p) => (
                           <option key={p.id} value={p.id} className="bg-white">
                             {p.name}
                           </option>
                         ))}
                       </select>
+                      <p className="mt-1 text-[11px] text-[#151f76]/45">
+                        Legt ein neues Board mit diesem Namen an; alle Aufgaben landen direkt darin.
+                      </p>
                     </div>
                     <div>
                       <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#151f76]/55">
@@ -291,7 +297,7 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
                         type="submit"
                         className="flex items-center gap-1.5 rounded-lg accent-gradient px-4 py-1.5 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
                       >
-                        <Play size={13} /> {process.tasks.length} Aufgabe{process.tasks.length === 1 ? '' : 'n'} anlegen
+                        <Play size={13} /> Board mit {process.tasks.length} Aufgabe{process.tasks.length === 1 ? '' : 'n'} anlegen
                       </button>
                     </div>
                   </form>

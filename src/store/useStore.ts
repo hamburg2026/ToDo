@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, Page, Person, ProcessTaskTemplate, ProcessTemplate, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
+import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, LayoutMode, Page, Person, ProcessTaskTemplate, ProcessTemplate, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
 import { BOARD_COLORS, CARD_COLORS, CATEGORY_COLOR_PALETTE, DEFAULT_CATEGORIES, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
 import { addDaysToIso } from '../lib/date'
 
@@ -17,6 +17,7 @@ interface StoreState {
   cardFont: CardFont
   cardFontSize: CardFontSize
   theme: ThemeId
+  layoutMode: LayoutMode
   pinboardZoom: number
   kanbanZoom: number
   peopleManagerOpen: boolean
@@ -36,6 +37,7 @@ interface StoreState {
   setCardFont: (font: CardFont) => void
   setCardFontSize: (size: CardFontSize) => void
   setTheme: (theme: ThemeId) => void
+  setLayoutMode: (mode: LayoutMode) => void
   setPinboardZoom: (zoom: number) => void
   setKanbanZoom: (zoom: number) => void
   openPeopleManager: () => void
@@ -86,7 +88,7 @@ interface StoreState {
   addProcessTask: (processId: string, title: string) => void
   updateProcessTask: (processId: string, taskId: string, patch: Partial<ProcessTaskTemplate>) => void
   deleteProcessTask: (processId: string, taskId: string) => void
-  runProcess: (processId: string, params: { assigneeId: string | null; startDate: string }) => void
+  runProcess: (processId: string, params: { employeePersonId: string | null; startDate: string }) => void
 
   exportData: () => string
   importData: (json: string) => { ok: true } | { ok: false; error: string }
@@ -110,7 +112,7 @@ interface BackupPayload {
 }
 
 const seedPeople: Person[] = [
-  { id: nanoid(), name: 'Jürgen Kriszio', color: '#8b5cf6', initials: 'JK' },
+  { id: nanoid(), name: 'Max Mustermann', color: '#8b5cf6', initials: 'MM' },
   { id: nanoid(), name: 'Anna Weber', color: '#22d3ee', initials: 'AW' },
 ]
 
@@ -218,6 +220,7 @@ export const useStore = create<StoreState>()(
       cardFont: 'sans',
       cardFontSize: 'md',
       theme: 'blue',
+      layoutMode: 'cards',
       pinboardZoom: 1,
       kanbanZoom: 1,
       peopleManagerOpen: false,
@@ -234,6 +237,7 @@ export const useStore = create<StoreState>()(
       setCardFont: (font) => set({ cardFont: font }),
       setCardFontSize: (size) => set({ cardFontSize: size }),
       setTheme: (theme) => set({ theme }),
+      setLayoutMode: (mode) => set({ layoutMode: mode }),
       setPinboardZoom: (zoom) => set({ pinboardZoom: clampZoom(zoom) }),
       setKanbanZoom: (zoom) => set({ kanbanZoom: clampZoom(zoom) }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
@@ -525,21 +529,18 @@ export const useStore = create<StoreState>()(
       runProcess: (processId, params) => {
         const process = get().processTemplates.find((p) => p.id === processId)
         if (!process || process.tasks.length === 0) return
-        const assignee = params.assigneeId ? get().people.find((p) => p.id === params.assigneeId) : null
-        const employeeTag = assignee ? assignee.name.trim().toLowerCase().replace(/\s+/g, '-') : null
+        const employee = params.employeePersonId ? get().people.find((p) => p.id === params.employeePersonId) : null
+        const board: Board = { id: nanoid(), name: employee?.name || process.name, color: randomPick(BOARD_COLORS) }
         const t = now()
-        const baseOrder = get().tasks.filter(
-          (x) => x.page === 'pinboard' && x.columnId === 'backlog',
-        ).length
         const newTasks: Task[] = process.tasks.map((taskTemplate, index) => ({
           id: nanoid(),
           title: taskTemplate.title,
           description: '',
-          assigneeId: params.assigneeId,
+          assigneeId: null,
           start: null,
           end: addDaysToIso(params.startDate, -(taskTemplate.offsetWeeks * 7 + taskTemplate.offsetDays)),
           category: '',
-          hashtags: employeeTag ? [employeeTag] : [],
+          hashtags: [],
           checklist: [],
           today: false,
           important: false,
@@ -547,10 +548,10 @@ export const useStore = create<StoreState>()(
           archived: false,
           archiveUnseen: false,
           archivedAt: null,
-          page: 'pinboard',
-          boardId: null,
+          page: 'board',
+          boardId: board.id,
           columnId: 'backlog',
-          order: baseOrder + index,
+          order: index,
           x: 80 + Math.random() * 600,
           y: 80 + Math.random() * 400,
           rotation: Math.random() * 6 - 3,
@@ -558,7 +559,12 @@ export const useStore = create<StoreState>()(
           createdAt: t,
           updatedAt: t,
         }))
-        set({ tasks: [...get().tasks, ...newTasks] })
+        set({
+          boards: [...get().boards, board],
+          tasks: [...get().tasks, ...newTasks],
+          activeBoardId: board.id,
+          currentPage: 'board',
+        })
       },
 
       exportData: () => {

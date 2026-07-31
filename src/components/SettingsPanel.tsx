@@ -1,10 +1,16 @@
-import { Check, X } from 'lucide-react'
+import { Check, X, LayoutGrid, Rows3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { CARD_FONT_CLASSES, CARD_FONT_OPTIONS, CARD_FONT_SIZE_CLASSES, CARD_FONT_SIZE_OPTIONS, THEMES } from '../lib/constants'
+import type { LayoutMode } from '../types'
 
 interface Props {
   onClose: () => void
 }
+
+const LAYOUT_OPTIONS: { id: LayoutMode; label: string; hint: string; icon: typeof LayoutGrid }[] = [
+  { id: 'cards', label: 'Pinnwand-Stil', hint: 'Bunte Kacheln, frei verschiebbar', icon: LayoutGrid },
+  { id: 'list', label: 'Listen-Stil', hint: 'Nüchterne, sortierbare Tabelle', icon: Rows3 },
+]
 
 export default function SettingsPanel({ onClose }: Props) {
   const cardFont = useStore((s) => s.cardFont)
@@ -13,6 +19,8 @@ export default function SettingsPanel({ onClose }: Props) {
   const setCardFontSize = useStore((s) => s.setCardFontSize)
   const theme = useStore((s) => s.theme)
   const setTheme = useStore((s) => s.setTheme)
+  const layoutMode = useStore((s) => s.layoutMode)
+  const setLayoutMode = useStore((s) => s.setLayoutMode)
 
   return (
     <div className="fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
@@ -25,6 +33,36 @@ export default function SettingsPanel({ onClose }: Props) {
           <button onClick={onClose} className="rounded-full p-1.5 text-[#151f76]/55 hover:bg-[#151f76]/6 hover:text-[#151f76]">
             <X size={18} />
           </button>
+        </div>
+
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Darstellung</p>
+        <p className="mb-3 text-sm text-[#151f76]/65">
+          Bestimmt, wie Pinnwand, Heute zu tun und Board dargestellt werden.
+        </p>
+
+        <div className="mb-5 grid grid-cols-2 gap-2">
+          {LAYOUT_OPTIONS.map((option) => {
+            const active = layoutMode === option.id
+            const Icon = option.icon
+            return (
+              <button
+                key={option.id}
+                onClick={() => setLayoutMode(option.id)}
+                className={`flex flex-col items-center gap-1.5 rounded-xl border py-4 text-center transition-colors ${
+                  active ? 'border-violet-400 bg-violet-500/15' : 'border-[#151f76]/10 bg-[#151f76]/4 hover:bg-[#151f76]/6'
+                }`}
+              >
+                <Icon size={22} className="text-[#151f76]" />
+                <span className="text-sm font-medium text-[#151f76]">{option.label}</span>
+                <span className="px-2 text-[11px] text-[#151f76]/55">{option.hint}</span>
+                {active && (
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-500 text-white">
+                    <Check size={12} />
+                  </div>
+                )}
+              </button>
+            )
+          })}
         </div>
 
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#151f76]/55">Farbdesign</p>
