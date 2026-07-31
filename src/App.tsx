@@ -255,12 +255,10 @@ export default function App() {
         />
       )}
 
-      {processManagerOpen && (
-        <ProcessManager onClose={closeProcessManager} onOpenPeople={() => useStore.getState().openPeopleManager()} />
-      )}
-      {/* People/Boards/Categories managers can be opened from within TaskModal or
-          ProcessManager while those stay open, so they must render after (= stack
-          on top of) both here, regardless of which one triggered them. */}
+      {processManagerOpen && <ProcessManager onClose={closeProcessManager} />}
+      {/* People/Boards/Categories managers can be opened from within TaskModal
+          while it stays open, so they must render after (= stack on top of) it
+          here, regardless of render order elsewhere. */}
       {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
       {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
       {categoriesManagerOpen && <CategoriesManager onClose={closeCategoriesManager} />}

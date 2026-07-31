@@ -88,7 +88,7 @@ interface StoreState {
   addProcessTask: (processId: string, title: string) => void
   updateProcessTask: (processId: string, taskId: string, patch: Partial<ProcessTaskTemplate>) => void
   deleteProcessTask: (processId: string, taskId: string) => void
-  runProcess: (processId: string, params: { employeePersonId: string | null; startDate: string }) => void
+  runProcess: (processId: string, params: { boardName: string; startDate: string }) => void
 
   exportData: () => string
   importData: (json: string) => { ok: true } | { ok: false; error: string }
@@ -535,8 +535,7 @@ export const useStore = create<StoreState>()(
       runProcess: (processId, params) => {
         const process = get().processTemplates.find((p) => p.id === processId)
         if (!process || process.tasks.length === 0) return
-        const employee = params.employeePersonId ? get().people.find((p) => p.id === params.employeePersonId) : null
-        const board: Board = { id: nanoid(), name: employee?.name || process.name, color: randomPick(BOARD_COLORS) }
+        const board: Board = { id: nanoid(), name: params.boardName.trim() || process.name, color: randomPick(BOARD_COLORS) }
         const t = now()
         const newTasks: Task[] = process.tasks.map((taskTemplate, index) => ({
           id: nanoid(),
