@@ -5,10 +5,9 @@ import { categoryColor } from '../lib/constants'
 
 interface Props {
   onClose: () => void
-  onOpenPeople: () => void
 }
 
-export default function ProcessManager({ onClose, onOpenPeople }: Props) {
+export default function ProcessManager({ onClose }: Props) {
   const processTemplates = useStore((s) => s.processTemplates)
   const people = useStore((s) => s.people)
   const categories = useStore((s) => s.categories)
@@ -34,7 +33,7 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
   const [taskTagInput, setTaskTagInput] = useState('')
 
   const [runningId, setRunningId] = useState<string | null>(null)
-  const [runEmployeePersonId, setRunEmployeePersonId] = useState<string | null>(null)
+  const [runBoardName, setRunBoardName] = useState('')
   const [runStartDate, setRunStartDate] = useState('')
 
   function handleAdd(e: React.FormEvent) {
@@ -97,16 +96,16 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
     if (task) updateProcessTask(processId, taskId, { hashtags: task.hashtags.filter((t) => t !== tag) })
   }
 
-  function startRun(processId: string) {
+  function startRun(processId: string, defaultName: string) {
     setRunningId(processId)
-    setRunEmployeePersonId(null)
+    setRunBoardName(defaultName)
     setRunStartDate('')
   }
 
   function handleRun(processId: string, e: React.FormEvent) {
     e.preventDefault()
-    if (!runStartDate || !runEmployeePersonId) return
-    runProcess(processId, { employeePersonId: runEmployeePersonId, startDate: runStartDate })
+    if (!runStartDate || !runBoardName.trim()) return
+    runProcess(processId, { boardName: runBoardName.trim(), startDate: runStartDate })
     setRunningId(null)
     onClose()
   }
@@ -188,7 +187,7 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
                   ) : (
                     <>
                       <button
-                        onClick={() => startRun(process.id)}
+                        onClick={() => startRun(process.id, process.name)}
                         disabled={process.tasks.length === 0}
                         title={process.tasks.length === 0 ? 'Prozess hat noch keine Aufgaben' : 'Prozess ausführen'}
                         className="flex items-center gap-1 rounded-full accent-gradient px-3 py-1.5 text-xs font-semibold text-white shadow-glow transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:scale-100"
@@ -382,31 +381,17 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
                     className="mt-2.5 space-y-2.5 border-t border-[#151f76]/10 pt-2.5"
                   >
                     <div>
-                      <div className="mb-1 flex items-center justify-between gap-1">
-                        <label className="text-[11px] font-semibold uppercase tracking-wide text-[#151f76]/55">
-                          Neuer Mitarbeiter (Board-Name)
-                        </label>
-                        <button
-                          type="button"
-                          onClick={onOpenPeople}
-                          className="flex items-center gap-1 text-[11px] font-medium text-violet-300 hover:text-violet-200"
-                        >
-                          <Users size={12} /> Verwalten
-                        </button>
-                      </div>
-                      <select
+                      <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#151f76]/55">
+                        Boardname
+                      </label>
+                      <input
                         required
-                        value={runEmployeePersonId ?? ''}
-                        onChange={(e) => setRunEmployeePersonId(e.target.value || null)}
-                        className="w-full rounded-lg border border-[#151f76]/10 bg-white/70 px-3 py-2 text-sm text-[#151f76] outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
-                      >
-                        <option value="" disabled className="bg-white">Person auswählen…</option>
-                        {people.map((p) => (
-                          <option key={p.id} value={p.id} className="bg-white">
-                            {p.name}
-                          </option>
-                        ))}
-                      </select>
+                        autoFocus
+                        value={runBoardName}
+                        onChange={(e) => setRunBoardName(e.target.value)}
+                        placeholder="z. B. Max Mustermann"
+                        className="w-full rounded-lg border border-[#151f76]/10 bg-white/70 px-3 py-2 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30"
+                      />
                       <p className="mt-1 text-[11px] text-[#151f76]/45">
                         Legt ein neues Board mit diesem Namen an; alle Aufgaben landen direkt darin.
                       </p>
