@@ -1,14 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, Page, Person, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
+import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, Page, Person, ProcessTaskTemplate, ProcessTemplate, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
 import { BOARD_COLORS, CARD_COLORS, CATEGORY_COLOR_PALETTE, DEFAULT_CATEGORIES, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
+import { addDaysToIso } from '../lib/date'
 
 interface StoreState {
   tasks: Task[]
   people: Person[]
   boards: Board[]
   categories: Category[]
+  processTemplates: ProcessTemplate[]
   activeBoardId: string
   currentPage: AppView
   boardView: BoardView
@@ -20,6 +22,7 @@ interface StoreState {
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
   categoriesManagerOpen: boolean
+  processManagerOpen: boolean
   settingsOpen: boolean
   archiveOpen: boolean
   activeTaskId: string | null
@@ -41,6 +44,8 @@ interface StoreState {
   closeBoardsManager: () => void
   openCategoriesManager: () => void
   closeCategoriesManager: () => void
+  openProcessManager: () => void
+  closeProcessManager: () => void
   openSettings: () => void
   closeSettings: () => void
   openArchive: () => void
@@ -75,6 +80,14 @@ interface StoreState {
   updateCategory: (id: string, patch: Partial<Category>) => void
   deleteCategory: (id: string) => void
 
+  addProcessTemplate: (name: string) => ProcessTemplate
+  updateProcessTemplate: (id: string, patch: Partial<Pick<ProcessTemplate, 'name'>>) => void
+  deleteProcessTemplate: (id: string) => void
+  addProcessTask: (processId: string, title: string) => void
+  updateProcessTask: (processId: string, taskId: string, patch: Partial<ProcessTaskTemplate>) => void
+  deleteProcessTask: (processId: string, taskId: string) => void
+  runProcess: (processId: string, params: { assigneeId: string | null; startDate: string }) => void
+
   exportData: () => string
   importData: (json: string) => { ok: true } | { ok: false; error: string }
   resetData: () => void
@@ -89,6 +102,7 @@ interface BackupPayload {
   people: Person[]
   boards: Board[]
   categories: Category[]
+  processTemplates: ProcessTemplate[]
   activeBoardId: string
   cardFont: CardFont
   cardFontSize: CardFontSize
@@ -106,6 +120,22 @@ const seedBoards: Board[] = [
 ]
 
 const seedCategories: Category[] = DEFAULT_CATEGORIES.map((c) => ({ ...c, id: nanoid() }))
+
+function seedProcessTemplates(): ProcessTemplate[] {
+  return [
+    {
+      id: nanoid(),
+      name: 'Neuer Mitarbeiter',
+      tasks: [
+        { id: nanoid(), title: 'Ausweis beantragen', offsetWeeks: 3, offsetDays: 0 },
+        { id: nanoid(), title: 'Lohnsteuerkarte anfordern', offsetWeeks: 2, offsetDays: 0 },
+        { id: nanoid(), title: 'Laptop und Zubehör bestellen', offsetWeeks: 1, offsetDays: 0 },
+        { id: nanoid(), title: 'IT-Zugänge einrichten', offsetWeeks: 0, offsetDays: 2 },
+        { id: nanoid(), title: 'Arbeitsplatz vorbereiten', offsetWeeks: 0, offsetDays: 1 },
+      ],
+    },
+  ]
+}
 
 const now = () => Date.now()
 
@@ -181,6 +211,7 @@ export const useStore = create<StoreState>()(
       people: seedPeople,
       boards: seedBoards,
       categories: seedCategories,
+      processTemplates: seedProcessTemplates(),
       activeBoardId: seedBoards[0].id,
       currentPage: 'pinboard',
       boardView: 'kanban',
@@ -192,6 +223,7 @@ export const useStore = create<StoreState>()(
       peopleManagerOpen: false,
       boardsManagerOpen: false,
       categoriesManagerOpen: false,
+      processManagerOpen: false,
       settingsOpen: false,
       archiveOpen: false,
       activeTaskId: null,
@@ -210,6 +242,8 @@ export const useStore = create<StoreState>()(
       closeBoardsManager: () => set({ boardsManagerOpen: false }),
       openCategoriesManager: () => set({ categoriesManagerOpen: true }),
       closeCategoriesManager: () => set({ categoriesManagerOpen: false }),
+      openProcessManager: () => set({ processManagerOpen: true }),
+      closeProcessManager: () => set({ processManagerOpen: false }),
       openSettings: () => set({ settingsOpen: true }),
       closeSettings: () => set({ settingsOpen: false }),
       openArchive: () => set({ archiveOpen: true }),
@@ -449,6 +483,84 @@ export const useStore = create<StoreState>()(
 
       deleteCategory: (id) => set({ categories: get().categories.filter((c) => c.id !== id) }),
 
+      addProcessTemplate: (name) => {
+        const process: ProcessTemplate = { id: nanoid(), name, tasks: [] }
+        set({ processTemplates: [...get().processTemplates, process] })
+        return process
+      },
+
+      updateProcessTemplate: (id, patch) =>
+        set({
+          processTemplates: get().processTemplates.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+        }),
+
+      deleteProcessTemplate: (id) =>
+        set({ processTemplates: get().processTemplates.filter((p) => p.id !== id) }),
+
+      addProcessTask: (processId, title) =>
+        set({
+          processTemplates: get().processTemplates.map((p) =>
+            p.id === processId
+              ? { ...p, tasks: [...p.tasks, { id: nanoid(), title, offsetWeeks: 0, offsetDays: 0 }] }
+              : p,
+          ),
+        }),
+
+      updateProcessTask: (processId, taskId, patch) =>
+        set({
+          processTemplates: get().processTemplates.map((p) =>
+            p.id === processId
+              ? { ...p, tasks: p.tasks.map((t) => (t.id === taskId ? { ...t, ...patch } : t)) }
+              : p,
+          ),
+        }),
+
+      deleteProcessTask: (processId, taskId) =>
+        set({
+          processTemplates: get().processTemplates.map((p) =>
+            p.id === processId ? { ...p, tasks: p.tasks.filter((t) => t.id !== taskId) } : p,
+          ),
+        }),
+
+      runProcess: (processId, params) => {
+        const process = get().processTemplates.find((p) => p.id === processId)
+        if (!process || process.tasks.length === 0) return
+        const assignee = params.assigneeId ? get().people.find((p) => p.id === params.assigneeId) : null
+        const employeeTag = assignee ? assignee.name.trim().toLowerCase().replace(/\s+/g, '-') : null
+        const t = now()
+        const baseOrder = get().tasks.filter(
+          (x) => x.page === 'pinboard' && x.columnId === 'backlog',
+        ).length
+        const newTasks: Task[] = process.tasks.map((taskTemplate, index) => ({
+          id: nanoid(),
+          title: taskTemplate.title,
+          description: '',
+          assigneeId: params.assigneeId,
+          start: null,
+          end: addDaysToIso(params.startDate, -(taskTemplate.offsetWeeks * 7 + taskTemplate.offsetDays)),
+          category: '',
+          hashtags: employeeTag ? [employeeTag] : [],
+          checklist: [],
+          today: false,
+          important: false,
+          status: 'none',
+          archived: false,
+          archiveUnseen: false,
+          archivedAt: null,
+          page: 'pinboard',
+          boardId: null,
+          columnId: 'backlog',
+          order: baseOrder + index,
+          x: 80 + Math.random() * 600,
+          y: 80 + Math.random() * 400,
+          rotation: Math.random() * 6 - 3,
+          color: randomPick(CARD_COLORS),
+          createdAt: t,
+          updatedAt: t,
+        }))
+        set({ tasks: [...get().tasks, ...newTasks] })
+      },
+
       exportData: () => {
         const payload: BackupPayload = {
           version: BACKUP_VERSION,
@@ -457,6 +569,7 @@ export const useStore = create<StoreState>()(
           people: get().people,
           boards: get().boards,
           categories: get().categories,
+          processTemplates: get().processTemplates,
           activeBoardId: get().activeBoardId,
           cardFont: get().cardFont,
           cardFontSize: get().cardFontSize,
@@ -507,6 +620,7 @@ export const useStore = create<StoreState>()(
           people: payload.people,
           boards,
           categories: Array.isArray(payload.categories) && payload.categories.length > 0 ? payload.categories : get().categories,
+          processTemplates: Array.isArray(payload.processTemplates) ? payload.processTemplates : get().processTemplates,
           activeBoardId,
           cardFont: payload.cardFont ?? get().cardFont,
           cardFontSize: payload.cardFontSize ?? get().cardFontSize,
@@ -526,6 +640,7 @@ export const useStore = create<StoreState>()(
           people,
           boards,
           categories,
+          processTemplates: seedProcessTemplates(),
           activeBoardId: boards[0].id,
           currentPage: 'pinboard',
           boardView: 'kanban',

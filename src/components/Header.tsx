@@ -1,4 +1,4 @@
-import { PinIcon, Users, Tag, KanbanSquare, CalendarCheck2, Settings, Archive, BarChart3 } from 'lucide-react'
+import { PinIcon, Users, Tag, Workflow, KanbanSquare, CalendarCheck2, Settings, Archive, BarChart3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 import BoardsMenu from './BoardsMenu'
@@ -8,6 +8,7 @@ export default function Header() {
   const setCurrentPage = useStore((s) => s.setCurrentPage)
   const openPeopleManager = useStore((s) => s.openPeopleManager)
   const openCategoriesManager = useStore((s) => s.openCategoriesManager)
+  const openProcessManager = useStore((s) => s.openProcessManager)
   const openSettings = useStore((s) => s.openSettings)
   const openArchive = useStore((s) => s.openArchive)
   const archiveCompleted = useStore((s) => s.archiveCompleted)
@@ -72,6 +73,13 @@ export default function Header() {
           className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
         >
           <Tag size={14} /> Kategorien
+        </button>
+
+        <button
+          onClick={openProcessManager}
+          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
+        >
+          <Workflow size={14} /> Prozesse
         </button>
 
         <BoardsMenu />
