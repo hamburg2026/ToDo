@@ -129,11 +129,11 @@ function seedProcessTemplates(): ProcessTemplate[] {
       id: nanoid(),
       name: 'Neuer Mitarbeiter',
       tasks: [
-        { id: nanoid(), title: 'Ausweis beantragen', offsetWeeks: 3, offsetDays: 0 },
-        { id: nanoid(), title: 'Lohnsteuerkarte anfordern', offsetWeeks: 2, offsetDays: 0 },
-        { id: nanoid(), title: 'Laptop und Zubehör bestellen', offsetWeeks: 1, offsetDays: 0 },
-        { id: nanoid(), title: 'IT-Zugänge einrichten', offsetWeeks: 0, offsetDays: 2 },
-        { id: nanoid(), title: 'Arbeitsplatz vorbereiten', offsetWeeks: 0, offsetDays: 1 },
+        { id: nanoid(), title: 'Ausweis beantragen', offsetWeeks: 3, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
+        { id: nanoid(), title: 'Lohnsteuerkarte anfordern', offsetWeeks: 2, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
+        { id: nanoid(), title: 'Laptop und Zubehör bestellen', offsetWeeks: 1, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
+        { id: nanoid(), title: 'IT-Zugänge einrichten', offsetWeeks: 0, offsetDays: 2, assigneeId: null, category: '', hashtags: [] },
+        { id: nanoid(), title: 'Arbeitsplatz vorbereiten', offsetWeeks: 0, offsetDays: 1, assigneeId: null, category: '', hashtags: [] },
       ],
     },
   ]
@@ -505,7 +505,13 @@ export const useStore = create<StoreState>()(
         set({
           processTemplates: get().processTemplates.map((p) =>
             p.id === processId
-              ? { ...p, tasks: [...p.tasks, { id: nanoid(), title, offsetWeeks: 0, offsetDays: 0 }] }
+              ? {
+                  ...p,
+                  tasks: [
+                    ...p.tasks,
+                    { id: nanoid(), title, offsetWeeks: 0, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
+                  ],
+                }
               : p,
           ),
         }),
@@ -536,11 +542,11 @@ export const useStore = create<StoreState>()(
           id: nanoid(),
           title: taskTemplate.title,
           description: '',
-          assigneeId: null,
+          assigneeId: taskTemplate.assigneeId,
           start: null,
           end: addDaysToIso(params.startDate, -(taskTemplate.offsetWeeks * 7 + taskTemplate.offsetDays)),
-          category: '',
-          hashtags: [],
+          category: taskTemplate.category,
+          hashtags: taskTemplate.hashtags,
           checklist: [],
           today: false,
           important: false,

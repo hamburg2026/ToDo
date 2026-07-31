@@ -255,12 +255,15 @@ export default function App() {
         />
       )}
 
-      {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
-      {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
-      {categoriesManagerOpen && <CategoriesManager onClose={closeCategoriesManager} />}
       {processManagerOpen && (
         <ProcessManager onClose={closeProcessManager} onOpenPeople={() => useStore.getState().openPeopleManager()} />
       )}
+      {/* People/Boards/Categories managers can be opened from within TaskModal or
+          ProcessManager while those stay open, so they must render after (= stack
+          on top of) both here, regardless of which one triggered them. */}
+      {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
+      {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
+      {categoriesManagerOpen && <CategoriesManager onClose={closeCategoriesManager} />}
       {settingsOpen && <SettingsPanel onClose={closeSettings} />}
       {archiveOpen && <ArchiveManager onClose={closeArchive} />}
     </DndContext>
