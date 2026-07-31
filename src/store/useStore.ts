@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
-import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, Page, Person, ProcessTaskTemplate, ProcessTemplate, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
+import type { AppView, Board, BoardView, CardFont, CardFontSize, Category, ColumnId, LayoutMode, Page, Person, ProcessTaskTemplate, ProcessTemplate, Task, TaskDraft, TaskStatus, ThemeId } from '../types'
 import { BOARD_COLORS, CARD_COLORS, CATEGORY_COLOR_PALETTE, DEFAULT_CATEGORIES, PERSON_COLORS, clampZoom, initialsOf, randomPick } from '../lib/constants'
 import { addDaysToIso } from '../lib/date'
 
@@ -17,6 +17,7 @@ interface StoreState {
   cardFont: CardFont
   cardFontSize: CardFontSize
   theme: ThemeId
+  layoutMode: LayoutMode
   pinboardZoom: number
   kanbanZoom: number
   peopleManagerOpen: boolean
@@ -36,6 +37,7 @@ interface StoreState {
   setCardFont: (font: CardFont) => void
   setCardFontSize: (size: CardFontSize) => void
   setTheme: (theme: ThemeId) => void
+  setLayoutMode: (mode: LayoutMode) => void
   setPinboardZoom: (zoom: number) => void
   setKanbanZoom: (zoom: number) => void
   openPeopleManager: () => void
@@ -218,6 +220,7 @@ export const useStore = create<StoreState>()(
       cardFont: 'sans',
       cardFontSize: 'md',
       theme: 'blue',
+      layoutMode: 'cards',
       pinboardZoom: 1,
       kanbanZoom: 1,
       peopleManagerOpen: false,
@@ -234,6 +237,7 @@ export const useStore = create<StoreState>()(
       setCardFont: (font) => set({ cardFont: font }),
       setCardFontSize: (size) => set({ cardFontSize: size }),
       setTheme: (theme) => set({ theme }),
+      setLayoutMode: (mode) => set({ layoutMode: mode }),
       setPinboardZoom: (zoom) => set({ pinboardZoom: clampZoom(zoom) }),
       setKanbanZoom: (zoom) => set({ kanbanZoom: clampZoom(zoom) }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),

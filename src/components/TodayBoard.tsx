@@ -6,6 +6,7 @@ import { CARD_FONT_CLASSES } from '../lib/constants'
 import type { Task } from '../types'
 import HandwritingCapture from './HandwritingCapture'
 import TaskCard from './TaskCard'
+import TaskTable from './TaskTable'
 
 interface Props {
   onCreate: () => void
@@ -41,18 +42,20 @@ export default function TodayBoard({ onCreate, onEdit }: Props) {
   const boards = useStore((s) => s.boards)
   const activeBoardId = useStore((s) => s.activeBoardId)
   const cardFont = useStore((s) => s.cardFont)
+  const layoutMode = useStore((s) => s.layoutMode)
   const [handwritingOpen, setHandwritingOpen] = useState(false)
 
+  const emptyHint = 'Markiere eine Aufgabe in einem Board als „Heute“, oder ziehe eine Board-Karte auf die „Heute zu tun“-Zone am linken Rand.'
+
   return (
-    <div className="no-scrollbar relative h-full w-full overflow-auto bg-grid py-8 pl-20 pr-20">
-      {tasks.length === 0 ? (
+    <div className={`relative h-full w-full ${layoutMode === 'list' ? 'overflow-y-auto px-6 py-6 pb-28' : 'no-scrollbar overflow-auto bg-grid py-8 pl-20 pr-20'}`}>
+      {layoutMode === 'list' ? (
+        <TaskTable tasks={tasks} onEdit={onEdit} showBoard showMoveTo emptyMessage={`Für heute ist nichts geplant. ${emptyHint}`} />
+      ) : tasks.length === 0 ? (
         <div className="flex h-full items-center justify-center text-center text-[#151f76]/50">
           <div>
             <p className={`mb-2 ${CARD_FONT_CLASSES[cardFont]} text-3xl`}>Für heute ist nichts geplant</p>
-            <p className="text-sm">
-              Markiere eine Aufgabe in einem Board als „Heute“, oder ziehe eine Board-Karte auf die
-              „Heute zu tun“-Zone am linken Rand.
-            </p>
+            <p className="text-sm">{emptyHint}</p>
           </div>
         </div>
       ) : (

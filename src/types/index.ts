@@ -4,6 +4,8 @@ export type AppView = 'pinboard' | 'today' | 'board' | 'analytics'
 
 export type BoardView = 'kanban' | 'plan'
 
+export type LayoutMode = 'cards' | 'list'
+
 export type CardFont = 'sans' | 'hand' | 'serif'
 
 export type CardFontSize = 'sm' | 'md' | 'lg'
