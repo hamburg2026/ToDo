@@ -110,7 +110,7 @@ interface BackupPayload {
 }
 
 const seedPeople: Person[] = [
-  { id: nanoid(), name: 'Jürgen Kriszio', color: '#8b5cf6', initials: 'JK' },
+  { id: nanoid(), name: 'Max Mustermann', color: '#8b5cf6', initials: 'MM' },
   { id: nanoid(), name: 'Anna Weber', color: '#22d3ee', initials: 'AW' },
 ]
 
