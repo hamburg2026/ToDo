@@ -25,6 +25,17 @@ function startOfDay(d: Date): Date {
   return c
 }
 
+// Add (or, with a negative value, subtract) whole days from a yyyy-mm-dd
+// date string, returning a yyyy-mm-dd string in the same local calendar.
+export function addDaysToIso(iso: string, deltaDays: number): string {
+  const d = parseLocalDate(iso)
+  d.setDate(d.getDate() + deltaDays)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 // Whole days from today to the given date; negative when the date is in the past.
 export function daysUntil(iso: string): number {
   const today = startOfDay(new Date()).getTime()

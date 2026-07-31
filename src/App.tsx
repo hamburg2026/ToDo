@@ -24,6 +24,7 @@ import TaskModal from './components/TaskModal'
 import PeopleManager from './components/PeopleManager'
 import BoardsManager from './components/BoardsManager'
 import CategoriesManager from './components/CategoriesManager'
+import ProcessManager from './components/ProcessManager'
 import SettingsPanel from './components/SettingsPanel'
 import ArchiveManager from './components/ArchiveManager'
 import TaskCard from './components/TaskCard'
@@ -65,6 +66,8 @@ export default function App() {
   const closeBoardsManager = useStore((s) => s.closeBoardsManager)
   const categoriesManagerOpen = useStore((s) => s.categoriesManagerOpen)
   const closeCategoriesManager = useStore((s) => s.closeCategoriesManager)
+  const processManagerOpen = useStore((s) => s.processManagerOpen)
+  const closeProcessManager = useStore((s) => s.closeProcessManager)
   const settingsOpen = useStore((s) => s.settingsOpen)
   const closeSettings = useStore((s) => s.closeSettings)
   const archiveOpen = useStore((s) => s.archiveOpen)
@@ -255,6 +258,9 @@ export default function App() {
       {peopleManagerOpen && <PeopleManager onClose={closePeopleManager} />}
       {boardsManagerOpen && <BoardsManager onClose={closeBoardsManager} />}
       {categoriesManagerOpen && <CategoriesManager onClose={closeCategoriesManager} />}
+      {processManagerOpen && (
+        <ProcessManager onClose={closeProcessManager} onOpenPeople={() => useStore.getState().openPeopleManager()} />
+      )}
       {settingsOpen && <SettingsPanel onClose={closeSettings} />}
       {archiveOpen && <ArchiveManager onClose={closeArchive} />}
     </DndContext>

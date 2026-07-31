@@ -45,6 +45,20 @@ export interface Category {
   color: string
 }
 
+export interface ProcessTaskTemplate {
+  id: string
+  title: string
+  // How long before the process's start date this task becomes due.
+  offsetWeeks: number
+  offsetDays: number
+}
+
+export interface ProcessTemplate {
+  id: string
+  name: string
+  tasks: ProcessTaskTemplate[]
+}
+
 export interface Task {
   id: string
   title: string
