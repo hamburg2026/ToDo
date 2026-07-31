@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Plus, Trash2, X, Pencil, Check, Play, Workflow, Users, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, X, Pencil, Check, Play, Workflow, Users, Tag, Hash, ChevronDown, ChevronUp, Settings2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
+import { categoryColor } from '../lib/constants'
 
 interface Props {
   onClose: () => void
@@ -10,6 +11,7 @@ interface Props {
 export default function ProcessManager({ onClose, onOpenPeople }: Props) {
   const processTemplates = useStore((s) => s.processTemplates)
   const people = useStore((s) => s.people)
+  const categories = useStore((s) => s.categories)
   const addProcessTemplate = useStore((s) => s.addProcessTemplate)
   const updateProcessTemplate = useStore((s) => s.updateProcessTemplate)
   const deleteProcessTemplate = useStore((s) => s.deleteProcessTemplate)
@@ -27,6 +29,9 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
 
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [editTaskTitle, setEditTaskTitle] = useState('')
+
+  const [taskDetailId, setTaskDetailId] = useState<string | null>(null)
+  const [taskTagInput, setTaskTagInput] = useState('')
 
   const [runningId, setRunningId] = useState<string | null>(null)
   const [runEmployeePersonId, setRunEmployeePersonId] = useState<string | null>(null)
@@ -71,6 +76,27 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
     setEditingTaskId(null)
   }
 
+  function toggleTaskDetail(taskId: string) {
+    setTaskDetailId((v) => (v === taskId ? null : taskId))
+    setTaskTagInput('')
+  }
+
+  function commitTaskTag(processId: string, taskId: string) {
+    const clean = taskTagInput.trim().replace(/^#/, '').replace(/\s+/g, '-')
+    if (clean) {
+      const task = processTemplates.find((p) => p.id === processId)?.tasks.find((t) => t.id === taskId)
+      if (task && !task.hashtags.includes(clean)) {
+        updateProcessTask(processId, taskId, { hashtags: [...task.hashtags, clean] })
+      }
+    }
+    setTaskTagInput('')
+  }
+
+  function removeTaskTag(processId: string, taskId: string, tag: string) {
+    const task = processTemplates.find((p) => p.id === processId)?.tasks.find((t) => t.id === taskId)
+    if (task) updateProcessTask(processId, taskId, { hashtags: task.hashtags.filter((t) => t !== tag) })
+  }
+
   function startRun(processId: string) {
     setRunningId(processId)
     setRunEmployeePersonId(null)
@@ -89,7 +115,7 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
     <div className="fixed inset-x-0 top-0 z-50 flex h-dvh items-center justify-center bg-[#151f76]/35 p-4 animate-fade-in" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
+        className="max-h-[85dvh] w-full max-w-xl overflow-y-auto rounded-2xl glass p-6 shadow-glow animate-pop-in"
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-[#151f76]">Prozesse verwalten</h2>
@@ -181,51 +207,163 @@ export default function ProcessManager({ onClose, onOpenPeople }: Props) {
 
                 {expanded && (
                   <div className="mt-2.5 space-y-1.5 border-t border-[#151f76]/10 pt-2.5">
-                    {process.tasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-2">
-                        {editingTaskId === task.id ? (
-                          <input
-                            autoFocus
-                            value={editTaskTitle}
-                            onChange={(e) => setEditTaskTitle(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && saveTaskEdit(process.id)}
-                            onBlur={() => saveTaskEdit(process.id)}
-                            className="min-w-0 flex-1 rounded-md border border-violet-400 bg-white/70 px-1.5 py-1 text-sm text-[#151f76] outline-none"
-                          />
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => startEditTask(task.id, task.title)}
-                            className="min-w-0 flex-1 truncate text-left text-sm text-[#151f76] hover:text-violet-400"
-                          >
-                            {task.title}
-                          </button>
-                        )}
-                        <input
-                          type="number"
-                          min={0}
-                          value={task.offsetWeeks}
-                          onChange={(e) => updateProcessTask(process.id, task.id, { offsetWeeks: Math.max(0, Number(e.target.value) || 0) })}
-                          className="w-14 shrink-0 rounded-md border border-[#151f76]/10 bg-white/70 px-1.5 py-1 text-center text-xs text-[#151f76] outline-none focus:border-violet-400"
-                        />
-                        <span className="shrink-0 text-[11px] text-[#151f76]/45">Wo.</span>
-                        <input
-                          type="number"
-                          min={0}
-                          value={task.offsetDays}
-                          onChange={(e) => updateProcessTask(process.id, task.id, { offsetDays: Math.max(0, Number(e.target.value) || 0) })}
-                          className="w-14 shrink-0 rounded-md border border-[#151f76]/10 bg-white/70 px-1.5 py-1 text-center text-xs text-[#151f76] outline-none focus:border-violet-400"
-                        />
-                        <span className="shrink-0 text-[11px] text-[#151f76]/45">Tg. vorher</span>
-                        <button
-                          type="button"
-                          onClick={() => deleteProcessTask(process.id, task.id)}
-                          className="shrink-0 text-[#151f76]/35 hover:text-rose-500"
-                        >
-                          <X size={13} />
-                        </button>
-                      </div>
-                    ))}
+                    {process.tasks.map((task) => {
+                      const taskAssignee = people.find((p) => p.id === task.assigneeId)
+                      const detailOpen = taskDetailId === task.id
+                      return (
+                        <div key={task.id} className="rounded-lg border border-[#151f76]/8 bg-white/40 px-2 py-1.5">
+                          <div className="flex items-center gap-1.5">
+                            {editingTaskId === task.id ? (
+                              <input
+                                autoFocus
+                                value={editTaskTitle}
+                                onChange={(e) => setEditTaskTitle(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && saveTaskEdit(process.id)}
+                                onBlur={() => saveTaskEdit(process.id)}
+                                className="min-w-0 flex-1 rounded-md border border-violet-400 bg-white/70 px-1.5 py-1 text-sm text-[#151f76] outline-none"
+                              />
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => startEditTask(task.id, task.title)}
+                                className="min-w-0 flex-1 truncate text-left text-sm text-[#151f76] hover:text-violet-400"
+                              >
+                                {task.title}
+                              </button>
+                            )}
+                            {taskAssignee && (
+                              <span
+                                title={taskAssignee.name}
+                                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                                style={{ backgroundColor: taskAssignee.color }}
+                              >
+                                {taskAssignee.initials}
+                              </span>
+                            )}
+                            {task.category && (
+                              <span
+                                className="shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-white"
+                                style={{ backgroundColor: categoryColor(task.category, categories) }}
+                              >
+                                {task.category}
+                              </span>
+                            )}
+                            {task.hashtags.length > 0 && (
+                              <span className="flex shrink-0 items-center gap-0.5 text-[10px] text-[#151f76]/45">
+                                <Hash size={10} /> {task.hashtags.length}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-1.5 flex items-center gap-2">
+                            <input
+                              type="number"
+                              min={0}
+                              value={task.offsetWeeks}
+                              onChange={(e) => updateProcessTask(process.id, task.id, { offsetWeeks: Math.max(0, Number(e.target.value) || 0) })}
+                              className="w-14 shrink-0 rounded-md border border-[#151f76]/10 bg-white/70 px-1.5 py-1 text-center text-xs text-[#151f76] outline-none focus:border-violet-400"
+                            />
+                            <span className="shrink-0 text-[11px] text-[#151f76]/45">Wo.</span>
+                            <input
+                              type="number"
+                              min={0}
+                              value={task.offsetDays}
+                              onChange={(e) => updateProcessTask(process.id, task.id, { offsetDays: Math.max(0, Number(e.target.value) || 0) })}
+                              className="w-14 shrink-0 rounded-md border border-[#151f76]/10 bg-white/70 px-1.5 py-1 text-center text-xs text-[#151f76] outline-none focus:border-violet-400"
+                            />
+                            <span className="shrink-0 text-[11px] text-[#151f76]/45">Tg. vorher</span>
+                            <button
+                              type="button"
+                              onClick={() => toggleTaskDetail(task.id)}
+                              title="Standardwerte bearbeiten"
+                              className={`ml-auto shrink-0 rounded-md p-1 ${detailOpen ? 'bg-violet-500/20 text-violet-400' : 'text-[#151f76]/35 hover:text-violet-400'}`}
+                            >
+                              <Settings2 size={14} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteProcessTask(process.id, task.id)}
+                              className="shrink-0 text-[#151f76]/35 hover:text-rose-500"
+                            >
+                              <X size={13} />
+                            </button>
+                          </div>
+
+                          {detailOpen && (
+                            <div className="mt-2 space-y-2 border-t border-[#151f76]/10 pt-2">
+                              <div>
+                                <label className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#151f76]/50">
+                                  <Users size={11} /> Standard-Zuständigkeit
+                                </label>
+                                <select
+                                  value={task.assigneeId ?? ''}
+                                  onChange={(e) => updateProcessTask(process.id, task.id, { assigneeId: e.target.value || null })}
+                                  className="w-full rounded-md border border-[#151f76]/10 bg-white/70 px-2 py-1.5 text-sm text-[#151f76] outline-none focus:border-violet-400"
+                                >
+                                  <option value="">Nicht zugewiesen</option>
+                                  {people.map((p) => (
+                                    <option key={p.id} value={p.id}>
+                                      {p.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#151f76]/50">
+                                  <Tag size={11} /> Standard-Kategorie
+                                </label>
+                                <input
+                                  value={task.category}
+                                  onChange={(e) => updateProcessTask(process.id, task.id, { category: e.target.value })}
+                                  placeholder="z. B. Projekt"
+                                  className="w-full rounded-md border border-[#151f76]/10 bg-white/70 px-2 py-1.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400"
+                                />
+                                <div className="mt-1.5 flex flex-wrap gap-1">
+                                  {categories.map((c) => (
+                                    <button
+                                      key={c.id}
+                                      type="button"
+                                      onClick={() => updateProcessTask(process.id, task.id, { category: c.name })}
+                                      className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white transition-transform hover:scale-105"
+                                      style={{ backgroundColor: categoryColor(c.name, categories), opacity: task.category === c.name ? 1 : 0.55 }}
+                                    >
+                                      {c.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#151f76]/50">
+                                  <Hash size={11} /> Standard-Hashtags
+                                </label>
+                                <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-[#151f76]/10 bg-white/70 px-2 py-1.5 focus-within:border-violet-400">
+                                  {task.hashtags.map((tag) => (
+                                    <span key={tag} className="flex items-center gap-1 rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-500">
+                                      #{tag}
+                                      <button type="button" onClick={() => removeTaskTag(process.id, task.id, tag)} className="hover:text-violet-700">
+                                        <X size={11} />
+                                      </button>
+                                    </span>
+                                  ))}
+                                  <input
+                                    value={taskTagInput}
+                                    onChange={(e) => setTaskTagInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' || e.key === ',') {
+                                        e.preventDefault()
+                                        commitTaskTag(process.id, task.id)
+                                      }
+                                    }}
+                                    onBlur={() => commitTaskTag(process.id, task.id)}
+                                    placeholder="tag + Enter"
+                                    className="min-w-[80px] flex-1 bg-transparent px-1 py-0.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                     <form onSubmit={(e) => handleAddTask(process.id, e)} className="flex items-center gap-2 pt-0.5">
                       <Plus size={14} className="shrink-0 text-[#151f76]/35" />
                       <input

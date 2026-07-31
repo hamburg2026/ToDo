@@ -53,6 +53,9 @@ export interface ProcessTaskTemplate {
   // How long before the process's start date this task becomes due.
   offsetWeeks: number
   offsetDays: number
+  assigneeId: string | null
+  category: string
+  hashtags: string[]
 }
 
 export interface ProcessTemplate {
