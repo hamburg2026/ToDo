@@ -1,14 +1,12 @@
-import { PinIcon, Users, Tag, Workflow, KanbanSquare, CalendarCheck2, Settings, Archive, BarChart3 } from 'lucide-react'
+import { PinIcon, KanbanSquare, CalendarCheck2, Settings, Archive, BarChart3 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import BackupMenu from './BackupMenu'
 import BoardsMenu from './BoardsMenu'
+import ManageMenu from './ManageMenu'
 
 export default function Header() {
   const currentPage = useStore((s) => s.currentPage)
   const setCurrentPage = useStore((s) => s.setCurrentPage)
-  const openPeopleManager = useStore((s) => s.openPeopleManager)
-  const openCategoriesManager = useStore((s) => s.openCategoriesManager)
-  const openProcessManager = useStore((s) => s.openProcessManager)
   const openSettings = useStore((s) => s.openSettings)
   const openArchive = useStore((s) => s.openArchive)
   const archiveCompleted = useStore((s) => s.archiveCompleted)
@@ -17,7 +15,7 @@ export default function Header() {
   )
 
   return (
-    <header className="relative z-50 grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 px-6 py-4">
+    <header className="relative z-50 grid grid-cols-[auto_1fr_auto] items-start gap-x-4 gap-y-2 px-6 py-4">
       <div className="flex min-w-0 items-center gap-2.5 justify-self-start">
         <img src={`${import.meta.env.BASE_URL}brand/ponturo-icon.svg`} alt="" className="h-9 w-9 shrink-0" />
         <span className="whitespace-nowrap text-lg tracking-tight text-[#151f76]">
@@ -61,26 +59,7 @@ export default function Header() {
       </div>
 
       <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 justify-self-end">
-        <button
-          onClick={openPeopleManager}
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
-        >
-          <Users size={14} /> Personen
-        </button>
-
-        <button
-          onClick={openCategoriesManager}
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
-        >
-          <Tag size={14} /> Kategorien
-        </button>
-
-        <button
-          onClick={openProcessManager}
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#151f76]/10 bg-white/60 px-4 py-1.5 text-sm font-medium text-[#151f76]/80 transition-colors hover:bg-white/90"
-        >
-          <Workflow size={14} /> Prozesse
-        </button>
+        <ManageMenu />
 
         <BoardsMenu />
 
