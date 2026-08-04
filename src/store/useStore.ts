@@ -129,11 +129,11 @@ function seedProcessTemplates(): ProcessTemplate[] {
       id: nanoid(),
       name: 'Neuer Mitarbeiter',
       tasks: [
-        { id: nanoid(), title: 'Ausweis beantragen', offsetWeeks: 3, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
-        { id: nanoid(), title: 'Lohnsteuerkarte anfordern', offsetWeeks: 2, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
-        { id: nanoid(), title: 'Laptop und Zubehör bestellen', offsetWeeks: 1, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
-        { id: nanoid(), title: 'IT-Zugänge einrichten', offsetWeeks: 0, offsetDays: 2, assigneeId: null, category: '', hashtags: [] },
-        { id: nanoid(), title: 'Arbeitsplatz vorbereiten', offsetWeeks: 0, offsetDays: 1, assigneeId: null, category: '', hashtags: [] },
+        { id: nanoid(), title: 'Ausweis beantragen', description: '', offsetWeeks: 3, offsetDays: 0, assigneeId: null, category: '', hashtags: [], checklist: [], important: false, status: 'none' },
+        { id: nanoid(), title: 'Lohnsteuerkarte anfordern', description: '', offsetWeeks: 2, offsetDays: 0, assigneeId: null, category: '', hashtags: [], checklist: [], important: false, status: 'none' },
+        { id: nanoid(), title: 'Laptop und Zubehör bestellen', description: '', offsetWeeks: 1, offsetDays: 0, assigneeId: null, category: '', hashtags: [], checklist: [], important: false, status: 'none' },
+        { id: nanoid(), title: 'IT-Zugänge einrichten', description: '', offsetWeeks: 0, offsetDays: 2, assigneeId: null, category: '', hashtags: [], checklist: [], important: false, status: 'none' },
+        { id: nanoid(), title: 'Arbeitsplatz vorbereiten', description: '', offsetWeeks: 0, offsetDays: 1, assigneeId: null, category: '', hashtags: [], checklist: [], important: false, status: 'none' },
       ],
     },
   ]
@@ -509,7 +509,19 @@ export const useStore = create<StoreState>()(
                   ...p,
                   tasks: [
                     ...p.tasks,
-                    { id: nanoid(), title, offsetWeeks: 0, offsetDays: 0, assigneeId: null, category: '', hashtags: [] },
+                    {
+                      id: nanoid(),
+                      title,
+                      description: '',
+                      offsetWeeks: 0,
+                      offsetDays: 0,
+                      assigneeId: null,
+                      category: '',
+                      hashtags: [],
+                      checklist: [],
+                      important: false,
+                      status: 'none',
+                    },
                   ],
                 }
               : p,
@@ -540,16 +552,16 @@ export const useStore = create<StoreState>()(
         const newTasks: Task[] = process.tasks.map((taskTemplate, index) => ({
           id: nanoid(),
           title: taskTemplate.title,
-          description: '',
+          description: taskTemplate.description,
           assigneeId: taskTemplate.assigneeId,
           start: null,
           end: addDaysToIso(params.startDate, -(taskTemplate.offsetWeeks * 7 + taskTemplate.offsetDays)),
           category: taskTemplate.category,
           hashtags: taskTemplate.hashtags,
-          checklist: [],
+          checklist: taskTemplate.checklist.map((item) => ({ ...item, id: nanoid() })),
           today: false,
-          important: false,
-          status: 'none',
+          important: taskTemplate.important,
+          status: taskTemplate.status,
           archived: false,
           archiveUnseen: false,
           archivedAt: null,
@@ -661,14 +673,17 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: 'taskwall-storage',
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         const state = persistedState as
-          | { tasks?: Array<Omit<Task, 'page' | 'columnId'> & { page: string; columnId: string }> }
+          | {
+              tasks?: Array<Omit<Task, 'page' | 'columnId'> & { page: string; columnId: string }>
+              processTemplates?: Array<ProcessTemplate & { tasks: Array<Partial<ProcessTaskTemplate>> }>
+            }
           | undefined
-        if (!state?.tasks) return state
+        if (!state) return state
 
-        if (version < 1) {
+        if (state.tasks && version < 1) {
           // "today" was a distinct task location (its own freeform page); it's
           // now just a `today` flag on board tasks, so any task still parked
           // on that now-removed page location is routed back to the Pinnwand.
@@ -677,12 +692,27 @@ export const useStore = create<StoreState>()(
           )
         }
 
-        if (version < 2) {
+        if (state.tasks && version < 2) {
           // The "Review" and "Erledigt" Kanban columns were removed; fold
           // their tasks into "In Arbeit" rather than losing them from view.
           state.tasks = state.tasks.map((t) =>
             t.columnId === 'review' || t.columnId === 'done' ? { ...t, columnId: 'progress' } : t,
           )
+        }
+
+        if (state.processTemplates && version < 3) {
+          // Process task templates gained description/checklist/important/status
+          // fields so every task field can be preset, not just assignee/category/tags.
+          state.processTemplates = state.processTemplates.map((p) => ({
+            ...p,
+            tasks: p.tasks.map((t) => ({
+              ...t,
+              description: t.description ?? '',
+              checklist: t.checklist ?? [],
+              important: t.important ?? false,
+              status: t.status ?? 'none',
+            })),
+          })) as ProcessTemplate[]
         }
 
         return state
