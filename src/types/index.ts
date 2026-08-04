@@ -50,12 +50,16 @@ export interface Category {
 export interface ProcessTaskTemplate {
   id: string
   title: string
+  description: string
   // How long before the process's start date this task becomes due.
   offsetWeeks: number
   offsetDays: number
   assigneeId: string | null
   category: string
   hashtags: string[]
+  checklist: ChecklistItem[]
+  important: boolean
+  status: TaskStatus
 }
 
 export interface ProcessTemplate {

@@ -1,7 +1,27 @@
 import { useState } from 'react'
-import { Plus, Trash2, X, Pencil, Check, Play, Workflow, Users, Tag, Hash, ChevronDown, ChevronUp, Settings2 } from 'lucide-react'
+import { nanoid } from 'nanoid'
+import {
+  Plus,
+  Trash2,
+  X,
+  Pencil,
+  Check,
+  Play,
+  Workflow,
+  Users,
+  Tag,
+  Hash,
+  ChevronDown,
+  ChevronUp,
+  Settings2,
+  AlignLeft,
+  ListChecks,
+  Star,
+  Flag,
+} from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { categoryColor } from '../lib/constants'
+import { categoryColor, STATUS_OPTIONS } from '../lib/constants'
+import type { ChecklistItem } from '../types'
 
 interface Props {
   onClose: () => void
@@ -31,6 +51,9 @@ export default function ProcessManager({ onClose }: Props) {
 
   const [taskDetailId, setTaskDetailId] = useState<string | null>(null)
   const [taskTagInput, setTaskTagInput] = useState('')
+  const [taskChecklistInput, setTaskChecklistInput] = useState('')
+  const [editingChecklistItemId, setEditingChecklistItemId] = useState<string | null>(null)
+  const [editingChecklistText, setEditingChecklistText] = useState('')
 
   const [runningId, setRunningId] = useState<string | null>(null)
   const [runBoardName, setRunBoardName] = useState('')
@@ -78,6 +101,63 @@ export default function ProcessManager({ onClose }: Props) {
   function toggleTaskDetail(taskId: string) {
     setTaskDetailId((v) => (v === taskId ? null : taskId))
     setTaskTagInput('')
+    setTaskChecklistInput('')
+    setEditingChecklistItemId(null)
+  }
+
+  function findTask(processId: string, taskId: string) {
+    return processTemplates.find((p) => p.id === processId)?.tasks.find((t) => t.id === taskId)
+  }
+
+  function addChecklistItem(processId: string, taskId: string) {
+    const clean = taskChecklistInput.trim()
+    if (!clean) return
+    const task = findTask(processId, taskId)
+    if (task) updateProcessTask(processId, taskId, { checklist: [...task.checklist, { id: nanoid(), text: clean, done: false }] })
+    setTaskChecklistInput('')
+  }
+
+  function handleChecklistKeyDown(processId: string, taskId: string, e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      addChecklistItem(processId, taskId)
+    }
+  }
+
+  function toggleChecklistItem(processId: string, taskId: string, itemId: string) {
+    const task = findTask(processId, taskId)
+    if (task) updateProcessTask(processId, taskId, { checklist: task.checklist.map((i) => (i.id === itemId ? { ...i, done: !i.done } : i)) })
+  }
+
+  function removeChecklistItem(processId: string, taskId: string, itemId: string) {
+    const task = findTask(processId, taskId)
+    if (task) updateProcessTask(processId, taskId, { checklist: task.checklist.filter((i) => i.id !== itemId) })
+  }
+
+  function startEditChecklistItem(item: ChecklistItem) {
+    setEditingChecklistItemId(item.id)
+    setEditingChecklistText(item.text)
+  }
+
+  function commitChecklistItemEdit(processId: string, taskId: string) {
+    if (!editingChecklistItemId) return
+    const clean = editingChecklistText.trim()
+    const task = findTask(processId, taskId)
+    if (task && clean) {
+      updateProcessTask(processId, taskId, {
+        checklist: task.checklist.map((i) => (i.id === editingChecklistItemId ? { ...i, text: clean } : i)),
+      })
+    }
+    setEditingChecklistItemId(null)
+  }
+
+  function handleChecklistEditKeyDown(processId: string, taskId: string, e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      commitChecklistItemEdit(processId, taskId)
+    } else if (e.key === 'Escape') {
+      setEditingChecklistItemId(null)
+    }
   }
 
   function commitTaskTag(processId: string, taskId: string) {
@@ -230,6 +310,7 @@ export default function ProcessManager({ onClose }: Props) {
                                 {task.title}
                               </button>
                             )}
+                            {task.important && <Star size={13} className="shrink-0 fill-amber-400 text-amber-400" />}
                             {taskAssignee && (
                               <span
                                 title={taskAssignee.name}
@@ -250,6 +331,11 @@ export default function ProcessManager({ onClose }: Props) {
                             {task.hashtags.length > 0 && (
                               <span className="flex shrink-0 items-center gap-0.5 text-[10px] text-[#151f76]/45">
                                 <Hash size={10} /> {task.hashtags.length}
+                              </span>
+                            )}
+                            {task.checklist.length > 0 && (
+                              <span className="flex shrink-0 items-center gap-0.5 text-[10px] text-[#151f76]/45">
+                                <ListChecks size={10} /> {task.checklist.filter((i) => i.done).length}/{task.checklist.length}
                               </span>
                             )}
                           </div>
@@ -289,6 +375,47 @@ export default function ProcessManager({ onClose }: Props) {
 
                           {detailOpen && (
                             <div className="mt-2 space-y-2 border-t border-[#151f76]/10 pt-2">
+                              <div>
+                                <label className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#151f76]/50">
+                                  <AlignLeft size={11} /> Beschreibung
+                                </label>
+                                <textarea
+                                  value={task.description}
+                                  onChange={(e) => updateProcessTask(process.id, task.id, { description: e.target.value })}
+                                  rows={2}
+                                  placeholder="Details, Kontext, Notizen…"
+                                  className="w-full resize-none rounded-md border border-[#151f76]/10 bg-white/70 px-2 py-1.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none focus:border-violet-400"
+                                />
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => updateProcessTask(process.id, task.id, { important: !task.important })}
+                                  className={`flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-sm transition-colors ${
+                                    task.important
+                                      ? 'border-amber-400 bg-amber-400/15 text-amber-600'
+                                      : 'border-[#151f76]/10 bg-white/70 text-[#151f76]/60 hover:border-amber-300'
+                                  }`}
+                                >
+                                  <Star size={13} className={task.important ? 'fill-amber-400' : ''} />
+                                  Wichtig
+                                </button>
+                                <div className="flex flex-1 items-center gap-1.5">
+                                  <Flag size={11} className="shrink-0 text-[#151f76]/50" />
+                                  <select
+                                    value={task.status}
+                                    onChange={(e) => updateProcessTask(process.id, task.id, { status: e.target.value as typeof task.status })}
+                                    className="w-full rounded-md border border-[#151f76]/10 bg-white/70 px-2 py-1.5 text-sm text-[#151f76] outline-none focus:border-violet-400"
+                                  >
+                                    <option value="none">Kein Status</option>
+                                    {STATUS_OPTIONS.map((s) => (
+                                      <option key={s.id} value={s.id}>
+                                        {s.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
                               <div>
                                 <label className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#151f76]/50">
                                   <Users size={11} /> Standard-Zuständigkeit
@@ -356,6 +483,63 @@ export default function ProcessManager({ onClose }: Props) {
                                     placeholder="tag + Enter"
                                     className="min-w-[80px] flex-1 bg-transparent px-1 py-0.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none"
                                   />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#151f76]/50">
+                                  <ListChecks size={11} /> Standard-Checkliste
+                                </label>
+                                <div className="space-y-1 rounded-md border border-[#151f76]/10 bg-white/70 p-1.5">
+                                  {task.checklist.map((item) => (
+                                    <div key={item.id} className="flex items-center gap-1.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleChecklistItem(process.id, task.id, item.id)}
+                                        aria-label={item.done ? 'Erledigt' : 'Offen'}
+                                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                                          item.done ? 'border-violet-400 bg-violet-400 text-white' : 'border-[#151f76]/25 text-transparent hover:border-violet-400'
+                                        }`}
+                                      >
+                                        <Check size={10} />
+                                      </button>
+                                      {editingChecklistItemId === item.id ? (
+                                        <input
+                                          autoFocus
+                                          value={editingChecklistText}
+                                          onChange={(e) => setEditingChecklistText(e.target.value)}
+                                          onKeyDown={(e) => handleChecklistEditKeyDown(process.id, task.id, e)}
+                                          onBlur={() => commitChecklistItemEdit(process.id, task.id)}
+                                          className="min-w-0 flex-1 rounded-md border border-violet-400 bg-white/70 px-1.5 py-0.5 text-sm text-[#151f76] outline-none"
+                                        />
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => startEditChecklistItem(item)}
+                                          className={`min-w-0 flex-1 truncate text-left text-sm ${item.done ? 'text-[#151f76]/40 line-through' : 'text-[#151f76]'}`}
+                                        >
+                                          {item.text}
+                                        </button>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={() => removeChecklistItem(process.id, task.id, item.id)}
+                                        className="shrink-0 text-[#151f76]/35 hover:text-rose-500"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <div className="flex items-center gap-1.5 pt-0.5">
+                                    <Plus size={13} className="shrink-0 text-[#151f76]/35" />
+                                    <input
+                                      value={taskChecklistInput}
+                                      onChange={(e) => setTaskChecklistInput(e.target.value)}
+                                      onKeyDown={(e) => handleChecklistKeyDown(process.id, task.id, e)}
+                                      onBlur={() => addChecklistItem(process.id, task.id)}
+                                      placeholder="Punkt hinzufügen + Enter"
+                                      className="min-w-0 flex-1 bg-transparent px-0 py-0.5 text-sm text-[#151f76] placeholder-[#151f76]/35 outline-none"
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </div>
