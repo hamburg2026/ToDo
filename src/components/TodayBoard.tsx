@@ -12,14 +12,14 @@ interface Props {
 }
 
 export default function TodayBoard({ onCreate, onEdit }: Props) {
-  const tasks = useStore((s) => s.tasks).filter((t) => t.page === 'board' && t.today && !t.archived)
+  const tasks = useStore((s) => s.tasks).filter((t) => t.today && !t.archived)
   const activeBoardId = useStore((s) => s.activeBoardId)
   const layoutMode = useStore((s) => s.layoutMode)
   const zoom = useStore((s) => s.todayZoom)
   const setZoom = useStore((s) => s.setTodayZoom)
   const [handwritingOpen, setHandwritingOpen] = useState(false)
 
-  const emptyHint = 'Markiere eine Aufgabe in einem Board als „Heute“, oder ziehe eine Board-Karte auf die „Heute zu tun“-Zone am linken Rand.'
+  const emptyHint = 'Markiere eine Aufgabe auf der Pinnwand oder in einem Board als „Heute“, oder ziehe eine Karte auf die „Heute zu tun“-Zone am linken Rand.'
 
   const actionButtons = (
     <div className="fixed bottom-8 left-8 z-30 flex items-center gap-3">

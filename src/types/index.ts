@@ -90,6 +90,11 @@ export interface Task {
   order: number
   x: number
   y: number
+  // Position on the "Heute zu tun" freeform canvas — kept separate from x/y
+  // so moving a task within Today doesn't also shift it on the Pinnwand
+  // (a task can be a Pinnwand card *and* today's, shown in both canvases).
+  todayX: number
+  todayY: number
   rotation: number
   color: string
   createdAt: number
@@ -103,6 +108,8 @@ export type TaskDraft = Omit<
   | 'updatedAt'
   | 'x'
   | 'y'
+  | 'todayX'
+  | 'todayY'
   | 'rotation'
   | 'page'
   | 'boardId'

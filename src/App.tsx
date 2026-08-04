@@ -55,6 +55,7 @@ export default function App() {
   const activeBoardId = useStore((s) => s.activeBoardId)
   const setActiveBoardId = useStore((s) => s.setActiveBoardId)
   const setTaskPosition = useStore((s) => s.setTaskPosition)
+  const setTaskTodayPosition = useStore((s) => s.setTaskTodayPosition)
   const sendTaskToPage = useStore((s) => s.sendTaskToPage)
   const updateTask = useStore((s) => s.updateTask)
   const moveTaskToBoard = useStore((s) => s.moveTaskToBoard)
@@ -130,12 +131,12 @@ export default function App() {
 
     // Drag onto an edge tab: either a real page move ("Zur Pinnwand", real
     // Page value) or the "Heute zu tun" flag-only zone (sentinel 'today',
-    // not a Page — it just marks the board task as today's, it doesn't
-    // relocate it, so the board keeps showing it and we don't navigate).
+    // not a Page — it just marks the task as today's, regardless of whether
+    // it lives on the Pinnwand or a board, without relocating it).
     if (typeof over?.id === 'string' && over.id.startsWith('edge-nav-')) {
       const targetData = (over.data.current as { target?: Page | 'today' } | undefined)?.target
       if (targetData === 'today') {
-        if (task.page === 'board') updateTask(task.id, { today: true })
+        updateTask(task.id, { today: true })
         return
       }
       const targetPage: Page = targetData ?? 'pinboard'
@@ -146,23 +147,26 @@ export default function App() {
       return
     }
 
+    // "Heute zu tun" (see TodayBoard.tsx) is a freeform canvas too, keyed on
+    // the currently viewed page rather than task.page — a task marked
+    // `today` keeps its original page (Pinnwand or board) but is also
+    // filtered into the Today view, where it gets its own todayX/Y position
+    // (kept separate from x/y so moving it here doesn't also move it on the
+    // Pinnwand).
+    if (currentPage === 'today' && task.today) {
+      const zoom = useStore.getState().todayZoom
+      const nextX = Math.min(Math.max(0, task.todayX + delta.x / zoom), CANVAS_W - CARD_W)
+      const nextY = Math.min(Math.max(0, task.todayY + delta.y / zoom), CANVAS_H - CARD_H)
+      setTaskTodayPosition(task.id, nextX, nextY)
+      return
+    }
+
     if (task.page === 'pinboard') {
       // The Pinnwand canvas can be zoomed (see Pinboard.tsx), which scales
       // on-screen pixels relative to the underlying, unscaled coordinate
       // space that task.x/y live in — so the raw pointer delta needs to be
       // un-scaled before it's applied.
       const zoom = useStore.getState().pinboardZoom
-      const nextX = Math.min(Math.max(0, task.x + delta.x / zoom), CANVAS_W - CARD_W)
-      const nextY = Math.min(Math.max(0, task.y + delta.y / zoom), CANVAS_H - CARD_H)
-      setTaskPosition(task.id, nextX, nextY)
-      return
-    }
-
-    // "Heute zu tun" is a freeform canvas too (see TodayBoard.tsx), keyed on
-    // the currently viewed page rather than task.page — the task's page is
-    // still 'board', it's just filtered into this view by the `today` flag.
-    if (currentPage === 'today' && task.page === 'board' && task.today) {
-      const zoom = useStore.getState().todayZoom
       const nextX = Math.min(Math.max(0, task.x + delta.x / zoom), CANVAS_W - CARD_W)
       const nextY = Math.min(Math.max(0, task.y + delta.y / zoom), CANVAS_H - CARD_H)
       setTaskPosition(task.id, nextX, nextY)
@@ -231,7 +235,9 @@ export default function App() {
         </div>
 
         <BoardTabs />
-        {currentPage === 'board' ? (
+        {currentPage === 'pinboard' ? (
+          <EdgeZone side="left" label="Heute zu tun" target="today" active />
+        ) : currentPage === 'board' ? (
           <>
             <EdgeZone side="left" id="edge-nav-left-pinboard" label="Zur Pinnwand" target="pinboard" active slot="top" />
             <EdgeZone side="left" id="edge-nav-left-today" label="Heute zu tun" target="today" active slot="bottom" />

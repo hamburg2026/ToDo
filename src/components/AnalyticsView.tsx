@@ -137,7 +137,7 @@ export default function AnalyticsView({ onEdit }: Props) {
   const [detail, setDetail] = useState<TaskDetail | null>(null)
 
   const doneCount = tasks.filter((t) => t.status === 'erledigt').length
-  const todayTasks = tasks.filter((t) => t.page === 'board' && t.today)
+  const todayTasks = tasks.filter((t) => t.today)
   const overdue = tasks.filter(isOverdue).sort((a, b) => daysUntil(a.end as string) - daysUntil(b.end as string))
 
   const personCounts = [
