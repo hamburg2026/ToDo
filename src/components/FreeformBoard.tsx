@@ -28,7 +28,7 @@ export default function FreeformBoard({ tasks, onEdit, zoom, setZoom, emptyTitle
   }
 
   return (
-    <div className="no-scrollbar relative h-full w-full overflow-auto bg-grid pr-16" onWheel={handleWheelZoom}>
+    <div className="relative h-full w-full overflow-hidden bg-grid pr-16" onWheel={handleWheelZoom}>
       <div style={{ width: PINBOARD_WIDTH * zoom, height: PINBOARD_HEIGHT * zoom }}>
         <div
           className="relative origin-top-left"
