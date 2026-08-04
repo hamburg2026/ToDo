@@ -67,6 +67,7 @@ interface StoreState {
   moveTaskToColumn: (id: string, boardId: string, columnId: ColumnId, targetIndex?: number) => void
   reorderColumn: (boardId: string, columnId: ColumnId, orderedIds: string[]) => void
   setTaskPosition: (id: string, x: number, y: number) => void
+  setTaskTodayPosition: (id: string, x: number, y: number) => void
   sendTaskToPage: (id: string, page: Page, position?: { x: number; y: number }) => void
   moveTaskToBoard: (id: string, boardId: string) => void
   restoreFromArchive: (id: string, status: TaskStatus) => void
@@ -169,6 +170,8 @@ function seedTasks(people: Person[]): Task[] {
       order: 0,
       x: 60,
       y: 90,
+      todayX: 60,
+      todayY: 90,
       rotation: -2,
       color: '#facc15',
       createdAt: t,
@@ -200,6 +203,8 @@ function seedTasks(people: Person[]): Task[] {
       order: 1,
       x: 420,
       y: 160,
+      todayX: 100,
+      todayY: 120,
       rotation: 3,
       color: '#93c5fd',
       createdAt: t,
@@ -289,6 +294,8 @@ export const useStore = create<StoreState>()(
           order: get().tasks.filter((x) => x.columnId === 'backlog' && x.page === page && x.boardId === resolvedBoardId).length,
           x: position?.x ?? 80 + Math.random() * 160,
           y: position?.y ?? 80 + Math.random() * 160,
+          todayX: 80 + Math.random() * 160,
+          todayY: 80 + Math.random() * 160,
           rotation: Math.random() * 6 - 3,
           color: draft.color || randomPick(CARD_COLORS),
           createdAt: t,
@@ -359,6 +366,11 @@ export const useStore = create<StoreState>()(
       setTaskPosition: (id, x, y) =>
         set({
           tasks: get().tasks.map((t) => (t.id === id ? { ...t, x, y, updatedAt: now() } : t)),
+        }),
+
+      setTaskTodayPosition: (id, todayX, todayY) =>
+        set({
+          tasks: get().tasks.map((t) => (t.id === id ? { ...t, todayX, todayY, updatedAt: now() } : t)),
         }),
 
       sendTaskToPage: (id, page, position) => {
@@ -575,6 +587,8 @@ export const useStore = create<StoreState>()(
           order: index,
           x: 80 + Math.random() * 600,
           y: 80 + Math.random() * 400,
+          todayX: 80 + Math.random() * 160,
+          todayY: 80 + Math.random() * 160,
           rotation: Math.random() * 6 - 3,
           color: randomPick(CARD_COLORS),
           createdAt: t,
@@ -677,11 +691,11 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: 'taskwall-storage',
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
         const state = persistedState as
           | {
-              tasks?: Array<Omit<Task, 'page' | 'columnId'> & { page: string; columnId: string }>
+              tasks?: Array<Omit<Task, 'page' | 'columnId'> & { page: string; columnId: string; todayX?: number; todayY?: number }>
               processTemplates?: Array<ProcessTemplate & { tasks: Array<Partial<ProcessTaskTemplate>> }>
             }
           | undefined
@@ -717,6 +731,17 @@ export const useStore = create<StoreState>()(
               status: t.status ?? 'none',
             })),
           })) as ProcessTemplate[]
+        }
+
+        if (state.tasks && version < 4) {
+          // "Heute zu tun" is now its own freeform canvas with its own
+          // position, independent of x/y (the Pinnwand/board position) — so
+          // moving a card within Today doesn't also move it on the Pinnwand.
+          state.tasks = state.tasks.map((t) => ({
+            ...t,
+            todayX: t.todayX ?? t.x,
+            todayY: t.todayY ?? t.y,
+          }))
         }
 
         return state

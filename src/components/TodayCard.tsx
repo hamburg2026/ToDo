@@ -22,8 +22,8 @@ export default function TodayCard({ task, onEdit, z }: Props) {
     <div
       style={{
         position: 'absolute',
-        left: task.x,
-        top: task.y,
+        left: task.todayX,
+        top: task.todayY,
         zIndex: isDragging ? 999 : z,
         opacity: isDragging ? 0 : 1,
       }}
