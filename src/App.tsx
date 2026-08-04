@@ -158,6 +158,17 @@ export default function App() {
       return
     }
 
+    // "Heute zu tun" is a freeform canvas too (see TodayBoard.tsx), keyed on
+    // the currently viewed page rather than task.page — the task's page is
+    // still 'board', it's just filtered into this view by the `today` flag.
+    if (currentPage === 'today' && task.page === 'board' && task.today) {
+      const zoom = useStore.getState().todayZoom
+      const nextX = Math.min(Math.max(0, task.x + delta.x / zoom), CANVAS_W - CARD_W)
+      const nextY = Math.min(Math.max(0, task.y + delta.y / zoom), CANVAS_H - CARD_H)
+      setTaskPosition(task.id, nextX, nextY)
+      return
+    }
+
     // Kanban card logic
     if (!over) return
     const overType = (over.data.current as { type?: string } | undefined)?.type

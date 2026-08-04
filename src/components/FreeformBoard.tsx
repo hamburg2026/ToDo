@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { useStore } from '../store/useStore'
 import { CARD_FONT_CLASSES, PINBOARD_HEIGHT, PINBOARD_WIDTH, ZOOM_STEP, clampZoom } from '../lib/constants'
 import type { Task } from '../types'
@@ -13,9 +13,12 @@ interface Props {
   emptyTitle: string
   emptyHint: string
   actions?: ReactNode
+  // Lets callers swap in their own card presentation (e.g. Today's
+  // board-name label) while reusing this canvas/zoom/empty-state scaffold.
+  renderCard?: (task: Task, idx: number) => ReactNode
 }
 
-export default function FreeformBoard({ tasks, onEdit, zoom, setZoom, emptyTitle, emptyHint, actions }: Props) {
+export default function FreeformBoard({ tasks, onEdit, zoom, setZoom, emptyTitle, emptyHint, actions, renderCard }: Props) {
   const cardFont = useStore((s) => s.cardFont)
 
   function handleWheelZoom(e: React.WheelEvent) {
@@ -41,7 +44,9 @@ export default function FreeformBoard({ tasks, onEdit, zoom, setZoom, emptyTitle
             .slice()
             .sort((a, b) => a.updatedAt - b.updatedAt)
             .map((task, idx) => (
-              <PinboardCard key={task.id} task={task} onEdit={() => onEdit(task.id)} z={idx + 1} />
+              <Fragment key={task.id}>
+                {renderCard ? renderCard(task, idx) : <PinboardCard task={task} onEdit={() => onEdit(task.id)} z={idx + 1} />}
+              </Fragment>
             ))}
         </div>
       </div>

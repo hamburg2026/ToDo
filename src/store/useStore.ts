@@ -20,6 +20,7 @@ interface StoreState {
   layoutMode: LayoutMode
   pinboardZoom: number
   kanbanZoom: number
+  todayZoom: number
   peopleManagerOpen: boolean
   boardsManagerOpen: boolean
   categoriesManagerOpen: boolean
@@ -40,6 +41,7 @@ interface StoreState {
   setLayoutMode: (mode: LayoutMode) => void
   setPinboardZoom: (zoom: number) => void
   setKanbanZoom: (zoom: number) => void
+  setTodayZoom: (zoom: number) => void
   openPeopleManager: () => void
   closePeopleManager: () => void
   openBoardsManager: () => void
@@ -223,6 +225,7 @@ export const useStore = create<StoreState>()(
       layoutMode: 'cards',
       pinboardZoom: 1,
       kanbanZoom: 1,
+      todayZoom: 1,
       peopleManagerOpen: false,
       boardsManagerOpen: false,
       categoriesManagerOpen: false,
@@ -240,6 +243,7 @@ export const useStore = create<StoreState>()(
       setLayoutMode: (mode) => set({ layoutMode: mode }),
       setPinboardZoom: (zoom) => set({ pinboardZoom: clampZoom(zoom) }),
       setKanbanZoom: (zoom) => set({ kanbanZoom: clampZoom(zoom) }),
+      setTodayZoom: (zoom) => set({ todayZoom: clampZoom(zoom) }),
       openPeopleManager: () => set({ peopleManagerOpen: true }),
       closePeopleManager: () => set({ peopleManagerOpen: false }),
       openBoardsManager: () => set({ boardsManagerOpen: true }),
