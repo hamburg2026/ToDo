@@ -29,12 +29,17 @@ export default function KanbanColumn({ column, tasks, onEdit }: Props) {
         }`}
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-2 gap-3">
+          {/* Multi-column flow (not a row-based grid) so cards of different
+              heights stack directly under one another with no leftover gap
+              — each column fills top-to-bottom before spilling into the next. */}
+          <div className="columns-2 gap-3">
             {tasks
               .slice()
               .sort((a, b) => a.order - b.order)
               .map((task) => (
-                <KanbanCard key={task.id} task={task} onEdit={() => onEdit(task.id)} />
+                <div key={task.id} className="mb-3 break-inside-avoid">
+                  <KanbanCard task={task} onEdit={() => onEdit(task.id)} />
+                </div>
               ))}
           </div>
         </SortableContext>
