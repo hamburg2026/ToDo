@@ -30,6 +30,7 @@ import ArchiveManager from './components/ArchiveManager'
 import TaskCard from './components/TaskCard'
 import { useStore } from './store/useStore'
 import { useApplyTheme } from './hooks/useApplyTheme'
+import { useFixStaleViewportOnResume } from './hooks/useFixStaleViewportOnResume'
 import { PINBOARD_CARD_HEIGHT, PINBOARD_CARD_WIDTH, PINBOARD_HEIGHT, PINBOARD_WIDTH } from './lib/constants'
 import type { ColumnId, Page } from './types'
 
@@ -48,6 +49,7 @@ const collisionDetection: CollisionDetection = (args) => {
 
 export default function App() {
   useApplyTheme()
+  useFixStaleViewportOnResume()
   const currentPage = useStore((s) => s.currentPage)
   const setCurrentPage = useStore((s) => s.setCurrentPage)
   const boardView = useStore((s) => s.boardView)
@@ -215,7 +217,7 @@ export default function App() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="relative h-screen w-screen">
+      <div className="fixed inset-0">
         <div className="aurora-bg">
           <div className="brand-watermark" />
         </div>
