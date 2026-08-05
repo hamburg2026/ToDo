@@ -43,7 +43,7 @@ export default function TodayBoard({ onCreate, onEdit }: Props) {
 
   if (layoutMode === 'list') {
     return (
-      <div className="relative h-full w-full overflow-y-auto px-6 py-6 pb-28">
+      <div className="relative h-full w-full overflow-y-auto pl-20 pr-20 py-6 pb-28">
         <TaskTable tasks={tasks} onEdit={onEdit} showBoard showMoveTo emptyMessage={`Für heute ist nichts geplant. ${emptyHint}`} />
         {actionButtons}
         {handwritingOpen && (
