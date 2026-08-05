@@ -29,7 +29,7 @@ export default function KanbanBoard({ onEdit, onCreate }: Props) {
   return (
     <div className="relative h-full">
       {layoutMode === 'list' ? (
-        <div className="h-full overflow-y-auto pl-20 pr-6 py-6">
+        <div className="h-full overflow-y-auto pl-20 pr-20 py-6">
           <TaskTable tasks={tasks} onEdit={onEdit} showColumnSelector showMoveTo emptyMessage="Dieses Board ist noch leer." />
         </div>
       ) : (
